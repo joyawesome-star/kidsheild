@@ -48,6 +48,10 @@ _load_env_file(os.path.join(BASE_DIR, "envFile.txt"))
 # Import Supabase helpers only after DATABASE_URL is loaded
 from supabaseConnect import insert_and_get_id, get_query_result, execute_query
 
+# NOTE: This app historically used SQLAlchemy + raw SQL.
+# Deployment on Render must include a PostgreSQL driver.
+
+
 
 def create_app():
     app = Flask(__name__, static_folder=None)
