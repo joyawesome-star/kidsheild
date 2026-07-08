@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR Code Generator - Welcome</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: url('kidshield-bg.jpg') center/contain no-repeat fixed;
+            background-color: #1a1a2e;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 15px;
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.4);
+            display: flex;
+            max-width: 1050px;
+            width: 100%;
+            overflow: hidden;
+            position: relative;
+            z-index: 1;
+            color: white;
+        }
+
+        .content-section {
+            flex: 1;
+            padding: 60px 45px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .header {
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2.8em;
+            color: white;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header .subtitle {
+            font-size: 1.15em;
+            color: #a5b4fc;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        .description {
+            color: rgba(255, 255, 255, 0.8);
+            line-height: 1.8;
+            margin: 25px 0;
+            font-size: 1.05em;
+        }
+
+        .features {
+            margin: 25px 0;
+        }
+
+        .features h3 {
+            color: #a5b4fc;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+
+        .features ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .features li {
+            color: rgba(255, 255, 255, 0.75);
+            margin-bottom: 12px;
+            padding-left: 25px;
+            position: relative;
+            font-size: 1em;
+            line-height: 1.6;
+        }
+
+        .features li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #a5b4fc;
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+
+        .admin-section {
+            flex: 0 0 35%;
+            background: rgba(255, 255, 255, 0.04);
+            border-left: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 60px 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        .admin-section h2 {
+            color: white;
+            margin-bottom: 30px;
+            font-size: 1.3em;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        }
+
+        .admin-btn {
+            background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+            color: white;
+            padding: 15px 40px;
+            font-size: 1.1em;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            box-shadow: 0 4px 15px rgba(118, 75, 162, 0.3);
+            width: 100%;
+            max-width: 220px;
+        }
+
+        .admin-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(118, 75, 162, 0.5);
+            filter: brightness(1.1);
+        }
+
+        .admin-btn:active {
+            transform: translateY(-1px);
+        }
+
+        .user-btn {
+            background: transparent;
+            color: white;
+            padding: 15px 40px;
+            font-size: 1.1em;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            margin-top: 15px;
+            width: 100%;
+            max-width: 220px;
+        }
+
+        .user-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.1);
+            border-color: white;
+        }
+
+        .user-btn:active {
+            transform: translateY(-1px);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+
+            .admin-section {
+                flex: 1;
+                border-left: none;
+                border-top: 1px solid rgba(255, 255, 255, 0.1);
+                padding: 40px;
+            }
+
+            .content-section {
+                padding: 40px;
+            }
+
+            .header h1 {
+                font-size: 2.2em;
+            }
+
+            .description {
+                font-size: 0.95em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="content-section">
+            <div class="header">
+                <h1>KidShield</h1>
+                <div class="subtitle">Safeguarding Commutes with Smart Tags</div>
+            </div>
+
+            <p class="description">
+                A High-Margin, Hardware-Enabled SaaS Business Model Redefining Student Security across India.
+            </p>
+
+            <div class="features">
+                <h3>The Vulnerability Window</h3>
+                <p style="color: rgba(255,255,255,0.7); margin-bottom: 15px; font-size: 0.95em; line-height: 1.6;">
+                    Over 120 Million children commute daily in India. The transit window of dispersal, boarding, and pool-car handoffs is highly chaotic. Existing solutions like expensive tracking watches are banned in schools, while paper IDs tear easily, leaving kids vulnerable without reliable dynamic contact links in emergencies.
+                </p>
+            </div>
+
+            <div class="features">
+                <h3>How It Works</h3>
+                <ul>
+                    <li><strong>Scan the Tag:</strong> A teacher, driver, or bystander scans the high-contrast QR code during transit confusion or emergency</li>
+                    <li><strong>Instant Access:</strong> A responsive, secure web profile loads in under 3 seconds without installing any application</li>
+                    <li><strong>One-Click Call:</strong> The scanner views verified guardian coordinates, driver routes, or medical flags to immediately resolve tracking stress</li>
+                </ul>
+            </div>
+
+            <p class="description">
+                <strong>Premium Physical Hardware:</strong> A highly durable, lightweight, 3mm thick premium acrylic keychain cut into an attractive kid-friendly backpack shape. Built fully weatherproof to survive rough handling and torrential monsoons, hanging securely on schoolbags indefinitely.
+            </p>
+
+            <p class="description">
+                <strong>Dynamic Cloud Dashboard:</strong> When scanned via smartphone, it instantly launches a lightweight, app-less mobile landing profile displaying verified contact routes. Parents update phone details in real-time via secure OTP, protecting sensitive home address fields from public exposure.
+            </p>
+        </div>
+
+        <div class="admin-section">
+            <h2>Administrator Access</h2>
+            <a href="adminLogin.html" class="admin-btn">Admin Login</a>
+            <h2 style="margin-top: 40px; margin-bottom: 30px;">User Access</h2>
+            <a href="userLogin.html" class="user-btn">User Login</a>
+        </div>
+    </div>
+</body>
+</html>

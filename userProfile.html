@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>User Profile - KidShield</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: url('kidshield-bg.jpg') center/contain no-repeat fixed;
+      background-color: #1a1a2e;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    #logoutBtn {
+      position: absolute;
+      top: 18px;
+      right: 18px;
+      z-index: 2;
+      flex: 0 0 auto;
+      min-width: 180px;
+    }
+
+
+    .profile-container {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(15px);
+      -webkit-backdrop-filter: blur(15px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 15px;
+      box-shadow: 0 15px 50px rgba(0, 0, 0, 0.4);
+      width: 100%;
+      max-width: 520px;
+      padding: 50px 40px;
+      position: relative;
+      z-index: 1;
+      color: white;
+    }
+
+    .profile-header {
+      text-align: center;
+      margin-bottom: 25px;
+    }
+
+    .profile-header h1 {
+      color: white;
+      font-size: 2.0em;
+      margin-bottom: 10px;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    }
+
+    .profile-header p {
+      color: #a5b4fc;
+      font-size: 0.95em;
+      font-weight: 600;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    .welcome-card {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      border-radius: 12px;
+      padding: 18px 16px;
+      margin-bottom: 22px;
+    }
+
+    #welcomeMessage {
+      font-size: 1.1em;
+      font-weight: 700;
+      text-align: center;
+      color: #ffffff;
+    }
+
+    .subtext {
+      text-align: center;
+      margin-top: 10px;
+      color: rgba(165, 180, 252, 0.9);
+      font-weight: 600;
+      font-size: 0.95em;
+    }
+
+    .actions {
+      display: flex;
+      gap: 12px;
+      margin-top: 18px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      flex: 1;
+      min-width: 180px;
+      padding: 14px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      font-weight: 700;
+      font-size: 1.05em;
+      transition: all 0.3s ease;
+    }
+
+    .btn.primary {
+      background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+      color: white;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+
+    .btn.primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(118, 75, 162, 0.4);
+      filter: brightness(1.1);
+    }
+
+    .btn.secondary {
+      background: transparent;
+      color: white;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .btn.secondary:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: white;
+    }
+
+    .error-message {
+      display: none;
+      background: rgba(255, 0, 0, 0.15);
+      color: #ff9999;
+      padding: 12px;
+      border-radius: 8px;
+      margin-top: 16px;
+      border-left: 4px solid #ff4d4d;
+      font-weight: 700;
+      text-align: center;
+    }
+
+    .error-message.show {
+      display: block;
+    }
+
+    .loading {
+      display: none;
+      text-align: center;
+      color: #a5b4fc;
+      font-weight: 700;
+      margin-top: 12px;
+    }
+
+    .loading.show {
+      display: block;
+    }
+
+    @media (max-width: 480px) {
+      .profile-container {
+        padding: 40px 25px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="profile-container">
+    <div class="profile-header">
+      <h1>User Profile</h1>
+      <p>Welcome Back</p>
+    </div>
+
+    <div class="welcome-card">
+      <div id="welcomeMessage">Welcome ...</div>
+      <div id="profileSubtext" class="subtext">Validating your details...</div>
+      <div id="loading" class="loading">Loading...</div>
+      <div id="errorMessage" class="error-message"></div>
+    </div>
+
+    <div class="actions">
+      <a class="btn secondary" href="welcome.html" style="text-decoration:none; display:flex; justify-content:center; align-items:center;">
+        Back to Home
+      </a>
+      <a class="btn primary" href="qrProducts.html" style="text-decoration:none; display:flex; justify-content:center; align-items:center;">Buy QR</a>
+      <button class="btn primary" id="refreshQr" type="button">Refresh My QR Codes</button>
+    </div>
+
+    <button class="btn secondary" id="logoutBtn" type="button" aria-label="Logout" title="Logout">Logout</button>
+
+    <div class="qrSection" style="margin-top: 26px;">
+
+      <div class="qrHeader" style="text-align:center; margin-bottom: 12px;">
+        <div style="font-size: 1.05em; font-weight: 900;">Your QR Codes</div>
+        <div id="qrSubtext" class="subtext" style="font-size: 0.9em;">Loading your linked QR codes...</div>
+      </div>
+
+      <div id="qrList" style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.18); border-radius: 12px; padding: 14px;">
+        <div style="color: rgba(165,180,252,0.9); font-weight: 800; text-align:center;">No QR codes loaded.</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Profile page:
+    // - Shows logged-in name (from localStorage)
+    // - Loads user's linked QR codes and renders download buttons.
+
+    const welcomeMessage = document.getElementById('welcomeMessage');
+
+    const profileSubtext = document.getElementById('profileSubtext');
+    const errorMessage = document.getElementById('errorMessage');
+    const loading = document.getElementById('loading');
+    const goToQr = document.getElementById('goToQr');
+
+    function showError(msg) {
+      errorMessage.textContent = msg;
+      errorMessage.classList.add('show');
+    }
+
+    function showLoading() {
+      loading.classList.add('show');
+      profileSubtext.textContent = 'Validating your details...';
+    }
+
+    function hideLoading() {
+      loading.classList.remove('show');
+    }
+
+    function escapeHtml(str) {
+      return String(str ?? '').replace(/[&<>"']/g, (c) => ({
+        '&': '&amp;',
+        '<': '<',
+        '>': '>',
+        '"': '"',
+        "'": '&#39;',
+      }[c]));
+    }
+
+    function renderUserQrCodes(rows) {
+      const qrList = document.getElementById('qrList');
+      const qrSubtext = document.getElementById('qrSubtext');
+
+      if (!Array.isArray(rows) || rows.length === 0) {
+        qrSubtext.textContent = 'No QR codes linked to your account.';
+        qrList.innerHTML = `<div style="color: rgba(165,180,252,0.9); font-weight: 800; text-align:center;">No QR codes loaded.</div>`;
+        return;
+      }
+
+      qrSubtext.textContent = `Loaded ${rows.length} QR code(s).`;
+
+      const cards = rows.map((row) => {
+        const id = row?.id;
+        const img = row?.image_url;
+        const activated = row?.is_activated === true || row?.is_activated === "true";
+        return `
+          <div style="display:flex; gap:14px; align-items:flex-start; padding:12px 0; border-bottom:1px solid rgba(255,255,255,0.10);">
+            <div style="width:74px; flex:0 0 74px;">
+              ${img ? `<img src="${escapeHtml(img)}" alt="QR" style="width:62px;height:62px;object-fit:contain;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:10px;padding:6px;" />` : `<div style="width:62px;height:62px;display:flex;align-items:center;justify-content:center;color:rgba(165,180,252,0.75);font-weight:800;border:1px dashed rgba(255,255,255,0.25);border-radius:10px;">N/A</div>`}
+            </div>
+            <div style="flex:1;">
+              <div style="font-weight:900; font-size:1.02em; color:white;">QR ID: ${escapeHtml(id)}</div>
+              <div style="color: rgba(165,180,252,0.85); font-weight:700; font-size:0.92em; margin-top:4px;">Sold: ${row?.is_sold ? 'Yes' : 'No'}</div>
+              <div style="color: rgba(165,180,252,0.85); font-weight:700; font-size:0.92em; margin-top:4px;">Activated: ${activated ? 'Yes' : 'No'}</div>
+            </div>
+            <div style="flex:0 0 auto; display:flex; flex-direction:column; gap:10px; align-items:flex-end;">
+              ${row?.is_sold ? (
+                activated
+                  ? `<button class="btn secondary" type="button" style="min-width:180px; padding:10px 12px;" onclick="goToStudentFormForUpdate(${encodeURIComponent(id)})">Update details</button>`
+                  : `<button class="btn primary" type="button" style="min-width:180px; padding:10px 12px;" onclick="activateQrAndOpenForm(${encodeURIComponent(id)})">Activate QR</button>`
+              ) : (
+                `<div style="font-weight:800; color: rgba(165,180,252,0.6); font-size:0.9em;">Not sold yet</div>`
+              )}
+
+            </div>
+          </div>
+        `;
+      });
+
+      qrList.innerHTML = cards.join('');
+    }
+
+    async function loadMyQrCodes() {
+      const qrSubtext = document.getElementById('qrSubtext');
+      const qrList = document.getElementById('qrList');
+
+      qrSubtext.textContent = 'Loading your linked QR codes...';
+      qrList.innerHTML = `<div style="color: rgba(165,180,252,0.9); font-weight: 800; text-align:center;">Loading...</div>`;
+
+      const resp = await fetch('/api/user/qr_codes', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({})
+      });
+
+      if (!resp.ok) {
+        if (resp.status === 401) {
+          window.location.href = '/userLogin.html';
+          return;
+        }
+        const text = await resp.text().catch(() => '');
+        throw new Error(text || `Failed with status ${resp.status}`);
+      }
+
+      const data = await resp.json();
+      renderUserQrCodes(data?.rows || []);
+
+    }
+
+    async function init() {
+      try {
+        showLoading();
+
+        // Prefer stored values from login page.
+        const storedName = localStorage.getItem('loggedInUserName');
+        if (storedName) {
+          welcomeMessage.textContent = `Welcome ${storedName}`;
+          profileSubtext.textContent = 'You are logged in.';
+          hideLoading();
+          await loadMyQrCodes();
+          return;
+        }
+
+        // If not present, check query param override.
+        const url = new URL(window.location.href);
+        const nameFromQuery = url.searchParams.get('name');
+        if (nameFromQuery) {
+          localStorage.setItem('loggedInUserName', nameFromQuery);
+          welcomeMessage.textContent = `Welcome ${nameFromQuery}`;
+          profileSubtext.textContent = 'You are logged in.';
+          hideLoading();
+          await loadMyQrCodes();
+          return;
+        }
+
+        // Fallback
+        welcomeMessage.textContent = 'Welcome ...';
+        profileSubtext.textContent = 'Please login to view your profile.';
+        hideLoading();
+      } catch (e) {
+        showError('Could not load your QR codes right now.');
+        hideLoading();
+      }
+    }
+
+    document.getElementById('refreshQr').addEventListener('click', () => {
+      loadMyQrCodes().catch((e) => {
+        showError(String(e));
+      });
+    });
+
+    // Activate QR and open student form (edit/create mode handled in studentForm.html)
+    async function activateQrAndOpenForm(qrCodeId) {
+      if (!qrCodeId && qrCodeId !== 0) return;
+
+      try {
+        const resp = await fetch('/api/user/qr_codes/activate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ qr_code_id: qrCodeId })
+        });
+
+        if (!resp.ok) {
+          const text = await resp.text().catch(() => '');
+          throw new Error(text || `Failed with status ${resp.status}`);
+        }
+
+        // Redirect to studentForm in edit mode (since it may already exist)
+        window.location.href = `/studentForm.html?qr_code_id=${encodeURIComponent(qrCodeId)}&mode=edit`;
+      } catch (e) {
+        showError(String(e));
+      }
+    }
+
+    // Always redirect to studentForm edit mode for the QR id.
+    function goToStudentFormForUpdate(qrCodeId) {
+      if (!qrCodeId && qrCodeId !== 0) return;
+      window.location.href = `/studentForm.html?qr_code_id=${encodeURIComponent(qrCodeId)}&mode=edit`;
+    }
+
+    // Expose for inline onclick handlers
+    window.activateQrAndOpenForm = activateQrAndOpenForm;
+    window.goToStudentFormForUpdate = goToStudentFormForUpdate;
+
+    document.getElementById('logoutBtn').addEventListener('click', async () => {
+      try {
+        await fetch('/logout', { method: 'POST' });
+      } catch (e) {
+        // ignore
+      }
+      localStorage.removeItem('loggedInUserId');
+      localStorage.removeItem('loggedInUserName');
+      window.location.href = '/welcome.html';
+    });
+
+    init();
+
+
+
+  </script>
+</body>
+</html>
+

@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generate QR Code - KidShield</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: url('kidshield-bg.jpg') center/contain no-repeat fixed;
+            background-color: #1a1a2e;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.4);
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.4);
+            width: 100%;
+            max-width: 600px;
+            padding: 50px 40px;
+            position: relative;
+            z-index: 1;
+            color: white;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 35px;
+        }
+
+        .header h1 {
+            color: white;
+            font-size: 2.2em;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            color: #a5b4fc;
+            font-size: 1.1em;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .welcome-message {
+            background: rgba(76, 175, 80, 0.15);
+            border: 1px solid rgba(76, 175, 80, 0.3);
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 5px solid #4caf50;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .welcome-message h2 {
+            color: #81c784;
+            font-size: 1.4em;
+            margin-bottom: 5px;
+        }
+
+        .welcome-message p {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.95em;
+        }
+
+        .form-group {
+            margin-bottom: 30px;
+        }
+
+        .form-group label {
+            display: block;
+            color: rgba(255, 255, 255, 0.9);
+            font-weight: 600;
+            margin-bottom: 12px;
+            font-size: 1em;
+        }
+
+        .form-group input[type="number"] {
+            width: 100%;
+            padding: 14px 18px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            font-size: 1.1em;
+            color: white;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input[type="number"]:focus {
+            outline: none;
+            background: rgba(255, 255, 255, 0.1);
+            border-color: #764ba2;
+            box-shadow: 0 0 10px rgba(118, 75, 162, 0.3);
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .generate-btn, .back-btn {
+            flex: 1;
+            padding: 15px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.05em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            display: inline-block;
+            text-decoration: none;
+        }
+
+        .generate-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            box-shadow: 0 5px 15px rgba(118, 75, 162, 0.3);
+        }
+
+        .generate-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+            filter: brightness(1.1);
+        }
+
+        .generate-btn:disabled {
+            background: rgba(255, 255, 255, 0.2);
+            color: rgba(255, 255, 255, 0.4);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .back-btn {
+            background: transparent;
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: white;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            color: #a5b4fc;
+            font-weight: 600;
+            margin-bottom: 25px;
+        }
+
+        .loading.show {
+            display: block;
+        }
+
+        .loading::after {
+            content: '';
+            display: inline-block;
+            width: 15px;
+            height: 15px;
+            margin-left: 8px;
+            border: 2px solid rgba(255,255,255,0.2);
+            border-top: 2px solid #a5b4fc;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            vertical-align: middle;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error-message {
+            background-color: rgba(255, 0, 0, 0.15);
+            color: #ff9999;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            border-left: 4px solid #ff4d4d;
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 40px 25px;
+            }
+
+            .header h1 {
+                font-size: 1.6em;
+            }
+
+            .button-group {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header" style="position: relative;">
+            <h1>KidShield QR Generator</h1>
+            <p>Generate QR Codes for Student Safety Tags</p>
+            <button type="button" class="back-btn" id="logoutBtn" style="position: absolute; right: 0; top: 0; border-color: rgba(255,255,255,0.25);">Logout</button>
+        </div>
+
+        <div class="welcome-message">
+            <h2>Welcome Admin User</h2>
+            <p>Create new QR codes for KidShield student safety tags</p>
+        </div>
+
+        <div id="errorMessage" class="error-message"></div>
+
+        <form id="qrcodeForm">
+            <div class="form-group">
+                <label for="quantity">Number of QR Codes to Generate</label>
+                <input 
+                    type="number" 
+                    id="quantity" 
+                    name="quantity" 
+                    min="1" 
+                    max="100"
+                    value="1"
+                    required
+                >
+            </div>
+
+            <div class="loading" id="loading">
+                <p>Generating QR code...</p>
+            </div>
+
+            <div class="button-group">
+                <button type="submit" class="generate-btn" id="generateBtn">Generate QR Code</button>
+                <a href="/admin_dashboard.html" class="back-btn">Go to dashboard</a>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        const form = document.getElementById('qrcodeForm');
+        const generateBtn = document.getElementById('generateBtn');
+        const loading = document.getElementById('loading');
+        const errorMessage = document.getElementById('errorMessage');
+        const quantityInput = document.getElementById('quantity');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const quantity = parseInt(quantityInput.value);
+
+            // Clear previous messages
+            errorMessage.classList.remove('show');
+
+            // Validation
+            if (quantity < 1 || quantity > 100) {
+                showError('Please enter a number between 1 and 100');
+                return;
+            }
+
+            // Show loading and disable button
+            loading.classList.add('show');
+            loading.querySelector('p').textContent = `Generating ${quantity} QR code${quantity > 1 ? 's' : ''}...`;
+            generateBtn.disabled = true;
+
+            try {
+                const response = await fetch('/generate_qrcode', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        quantity: quantity
+                    })
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    // Redirect to display page with the QR codes
+                    window.location.href = `/qr_codes_generated.html?count=${quantity}`;
+                } else {
+                    showError(result.message || 'Error generating QR codes. Please try again.');
+                    generateBtn.disabled = false;
+                    loading.classList.remove('show');
+                }
+            } catch (error) {
+                showError('Connection error. Please try again.');
+                generateBtn.disabled = false;
+                loading.classList.remove('show');
+                console.error('Error:', error);
+            }
+        });
+
+        function showError(message) {
+            errorMessage.textContent = message;
+            errorMessage.classList.add('show');
+        }
+
+        // Logout: clear admin session and go to welcome page
+        const logoutBtn = document.getElementById('logoutBtn');
+        if (logoutBtn) {
+            logoutBtn.addEventListener('click', async () => {
+                try {
+                    await fetch('/logout', { method: 'POST' });
+                } catch (error) {
+                    // ignore network/CSRF errors; we'll still redirect
+                }
+                window.location.href = '/welcome.html';
+            });
+        }
+    </script>
+</body>
+</html>

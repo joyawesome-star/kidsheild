@@ -1,0 +1,5 @@
+DATABASE_URL=postgresql://postgres:m4JFPkWCxOtBayj7@db.yjakxhhmesbncbxmibfp.supabase.co:5432/postgres
+
+MSG91_AUTH_KEY=544825Ai6Vy7Sy6a413045P1
+MSG91_FLOW_ID=6a414ece6773ab55cb053d56
+JWT_SECRET=b52e7f9385446dd990bf0f42a1681f4e67e8b2cc274aa6e9032bd72979a21d2d

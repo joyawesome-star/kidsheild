@@ -1,0 +1,827 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KidShield - Student Information Form</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: url('kidshield-bg.jpg') center/contain no-repeat fixed;
+            background-color: #1a1a2e;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px 10px;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.4);
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .form-wrapper {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 15px;
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.4);
+            width: 100%;
+            max-width: 760px;
+            overflow: hidden;
+            position: relative;
+            z-index: 1;
+            color: white;
+        }
+
+        .form-header {
+            background: rgba(255, 255, 255, 0.05);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 35px;
+            text-align: center;
+        }
+
+        .form-header h1 {
+            font-size: 2.2em;
+            font-weight: 700;
+            margin-bottom: 8px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .form-header p {
+            font-size: 15px;
+            color: #a5b4fc;
+            line-height: 1.5;
+            font-weight: 500;
+        }
+
+        form {
+            padding: 35px;
+        }
+
+        .section-title {
+            margin: 15px 0 20px;
+            font-size: 18px;
+            font-weight: 700;
+            color: #a5b4fc;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 20px 24px;
+            margin-bottom: 35px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        label {
+            font-size: 14px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        input,
+        select,
+        textarea {
+            width: 100%;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            padding: 12px 15px;
+            font-size: 14px;
+            color: white;
+            background: rgba(255, 255, 255, 0.05);
+            transition: all 0.3s ease;
+        }
+
+        select option {
+            background-color: #1a1a2e;
+            color: white;
+        }
+
+        input[readonly] {
+            color: rgba(255, 255, 255, 0.5);
+            background: rgba(255, 255, 255, 0.02);
+            cursor: not-allowed;
+        }
+
+        textarea {
+            min-height: 96px;
+            resize: vertical;
+        }
+
+        input:focus,
+        select:focus,
+        textarea:focus {
+            outline: none;
+            background: rgba(255, 255, 255, 0.1);
+            border-color: #764ba2;
+            box-shadow: 0 0 10px rgba(118, 75, 162, 0.3);
+        }
+
+        .actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 15px;
+            padding-top: 10px;
+        }
+
+        .back-button {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            z-index: 2;
+            border: 0;
+            border-radius: 8px;
+            padding: 12px 18px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            color: #ffffff;
+            background: rgba(255, 255, 255, 0.12);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        .back-button:hover {
+            background: rgba(255, 255, 255, 0.18);
+            transform: translateY(-2px);
+        }
+
+
+        .form-message {
+            min-height: 22px;
+            margin: -10px 0 25px;
+            font-size: 14px;
+            font-weight: 700;
+            padding: 12px;
+            border-radius: 8px;
+            display: none;
+            border-left: 4px solid transparent;
+        }
+
+        .form-message.success {
+            display: block;
+            background: rgba(0, 255, 0, 0.1);
+            color: #99ff99;
+            border-color: #4dff4d;
+        }
+
+        .form-message.error {
+            display: block;
+            background: rgba(255, 0, 0, 0.15);
+            color: #ff9999;
+            border-color: #ff4d4d;
+        }
+
+        .qr-result {
+            display: none;
+            margin: -6px 0 25px;
+            padding: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.04);
+        }
+
+        .qr-result.visible {
+            display: grid;
+            grid-template-columns: 140px minmax(0, 1fr);
+            gap: 20px;
+            align-items: center;
+        }
+
+        .qr-result img {
+            width: 140px;
+            height: 140px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: white;
+            padding: 8px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+
+        .qr-result h3 {
+            margin: 0 0 8px;
+            font-size: 17px;
+            color: #a5b4fc;
+        }
+
+        .qr-result p {
+            margin: 0;
+            font-size: 14px;
+            line-height: 1.5;
+            color: rgba(255, 255, 255, 0.8);
+            overflow-wrap: anywhere;
+            font-family: 'Courier New', monospace;
+        }
+
+        button {
+            border: 0;
+            border-radius: 8px;
+            padding: 12px 25px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .secondary-button {
+            color: white;
+            background: transparent;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .primary-button {
+            color: #ffffff;
+            background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+            box-shadow: 0 5px 15px rgba(118, 75, 162, 0.3);
+        }
+
+        .primary-button:disabled {
+            background: rgba(255, 255, 255, 0.2);
+            color: rgba(255, 255, 255, 0.4);
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        .secondary-button:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: white;
+        }
+
+        .primary-button:not(:disabled):hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(118, 75, 162, 0.5);
+            filter: brightness(1.1);
+        }
+
+        @media (max-width: 640px) {
+            body {
+                align-items: flex-start;
+                padding: 15px 10px;
+            }
+
+            .form-header,
+            form {
+                padding: 25px 20px;
+            }
+
+            .form-header h1 {
+                font-size: 1.8em;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+                gap: 18px;
+            }
+
+            .actions {
+                flex-direction: column-reverse;
+                gap: 10px;
+            }
+
+            button {
+                width: 100%;
+            }
+
+            .qr-result.visible {
+                grid-template-columns: 1fr;
+                text-align: center;
+                justify-items: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <main class="form-wrapper">
+        <header class="form-header">
+            <h1>Personal Details Form</h1>
+            <p>Please enter the required personal and guardian details.</p>
+        </header>
+
+        <form id="personal-details-form">
+            <h2 class="section-title">Personal Details</h2>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="name">Name</label>
+                    <input type="text" id="name" name="name" placeholder="Enter full name" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="date-of-birth">Date of Birth</label>
+                    <input type="date" id="date-of-birth" name="date-of-birth" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="age">Age</label>
+                    <input type="number" id="age" name="age" placeholder="Calculated from date of birth" min="0" max="120" required readonly>
+                </div>
+
+                <div class="form-group">
+                    <label for="blood-group">Blood Group</label>
+                    <select id="blood-group" name="blood-group" required>
+                        <option value="">Select blood group</option>
+                        <option value="A+">A+</option>
+                        <option value="A-">A-</option>
+                        <option value="B+">B+</option>
+                        <option value="B-">B-</option>
+                        <option value="AB+">AB+</option>
+                        <option value="AB-">AB-</option>
+                        <option value="O+">O+</option>
+                        <option value="O-">O-</option>
+                    </select>
+                </div>
+
+                <div class="form-group full-width">
+                    <label for="address">Address (Optional)</label>
+                    <textarea id="address" name="address" placeholder="Enter complete address" ></textarea>
+                </div>
+            </div>
+
+            <h2 class="section-title">Guardian Details</h2>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="guardian-name">Guardian's Name</label>
+                    <input type="text" id="guardian-name" name="guardian-name" placeholder="Enter guardian's name" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="relationship">Relationship</label>
+                    <input type="text" id="relationship" name="relationship" placeholder="Example: Father" required>
+                </div>
+
+                <div class="form-group full-width">
+                    <label for="guardian-contact">Guardian's Contact</label>
+                    <input type="tel" id="guardian-contact" name="guardian-contact" placeholder="Enter 10 digit contact number" pattern="[0-9]{10}" maxlength="10" inputmode="numeric" title="Enter a 10 digit contact number" required>
+                </div>
+
+                <div class="form-group full-width">
+                    <label for="guardian-email">Guardian's Email (Optional)</label>
+                    <input type="email" id="guardian-email" name="guardian-email" placeholder="Enter guardian email" >
+                </div>
+            </div>
+
+            <div class="form-message" id="form-message" aria-live="polite"></div>
+
+            <div class="qr-result" id="qr-result">
+                <img id="qr-image" alt="QR code for the personal details form">
+                <div>
+                    <h3>Scan to open this form</h3>
+                    <p id="qr-link"></p>
+                </div>
+            </div>
+
+            <div class="actions">
+                <button type="reset" class="secondary-button">Clear</button>
+                <button type="submit" class="primary-button" id="submit-button" disabled>Submit</button>
+            </div>
+
+            <button type="button" class="back-button" id="back-button">Back</button>
+        </form>
+    </main>
+
+    <script>
+        const form = document.getElementById('personal-details-form');
+        const submitButton = document.getElementById('submit-button');
+        const dateOfBirthInput = document.getElementById('date-of-birth');
+        const ageInput = document.getElementById('age');
+        const guardianContactInput = document.getElementById('guardian-contact');
+        const guardianEmailInput = document.getElementById('guardian-email');
+        const formMessage = document.getElementById('form-message');
+        const qrResult = document.getElementById('qr-result');
+
+        // Back button navigation
+        const backButton = document.getElementById('back-button');
+        if (backButton) {
+            backButton.addEventListener('click', () => {
+                window.location.href = '/userProfile.html';
+            });
+        }
+
+        const qrImage = document.getElementById('qr-image');
+        const qrLink = document.getElementById('qr-link');
+        const serverOrigin = window.location.origin;
+
+        const url = new URL(window.location.href);
+        const qrCodeId = url.searchParams.get('qr_code_id');
+        const mode = (url.searchParams.get('mode') || '').toLowerCase();
+
+        function getFormMode() {
+            // default: create
+            if (mode === 'edit') return 'edit';
+            return 'create';
+        }
+
+        const currentFormMode = getFormMode();
+        const readonlyFlag = (url.searchParams.get('readonly') || '').toString().trim() === '1' || (url.searchParams.get('readonly') || '').toString().trim().toLowerCase() === 'true';
+        const isReadonly = readonlyFlag || currentFormMode === 'view';
+
+        function applyReadonlyMode() {
+            if (!isReadonly) return;
+
+            // Disable all editable inputs in the form
+            const editableInputIds = [
+                'name',
+                'date-of-birth',
+                'age',
+                'blood-group',
+                'address',
+                'guardian-name',
+                'relationship',
+                'guardian-contact',
+                'guardian-email'
+            ];
+
+            editableInputIds.forEach((id) => {
+                const el = document.getElementById(id);
+                if (!el) return;
+
+                if (el.tagName === 'SELECT') {
+                    el.disabled = true;
+                } else if (el.tagName === 'TEXTAREA' || el.tagName === 'INPUT') {
+                    el.readOnly = true;
+                    el.disabled = true;
+                }
+            });
+
+            // Disable submit + clear actions
+            if (submitButton) submitButton.disabled = true;
+            const clearBtn = document.querySelector('button[type="reset"]');
+            if (clearBtn) clearBtn.disabled = true;
+
+            // Keep message hidden by default
+            if (formMessage) {
+                formMessage.style.display = 'none';
+            }
+        }
+
+        async function checkQrActivationOrShowMessage() {
+            // Only applies to readonly/view use-case.
+            if (!isReadonly) return { ok: true };
+
+            if (!qrCodeId) return { ok: true };
+
+            try {
+                const resp = await fetch('/api/user/qr_codes', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ page: 1, page_size: 100 })
+                });
+                // This endpoint returns paginated rows for the current user; we’ll just fall back gracefully.
+                const data = await resp.json().catch(() => ({}));
+                const rows = data?.rows || [];
+                const match = rows.find(r => String(r?.id) === String(qrCodeId));
+                if (!match) return { ok: true };
+
+                const sold = match?.is_sold === true || match?.is_sold === 'true';
+                const activated = match?.is_activated === true || match?.is_activated === 'true';
+
+                if (!sold || !activated) {
+                    setMessage('This QR is not activated yet.', '');
+                    return { ok: false };
+                }
+
+                return { ok: true };
+            } catch (e) {
+                return { ok: true };
+            }
+        }
+
+        // If in view/edit mode, load existing student details by qr_code_id.
+        async function loadExistingDetailsIfAny() {
+            applyReadonlyMode();
+            const activationCheck = await checkQrActivationOrShowMessage();
+            if (!activationCheck.ok) return;
+
+            console.log('studentForm init', { qrCodeId, currentFormMode, readonlyFlag, isReadonly });
+            if (!qrCodeId || !isReadonly && currentFormMode !== 'edit') return;
+
+
+            try {
+                const resolvedQrCodeId = qrCodeId;
+                const resp = await fetch('/api/user/students/by_qr_code_id', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ qr_code_id: resolvedQrCodeId })
+                });
+
+                const data = await resp.json().catch(() => ({}));
+
+                console.log('by_qr_code_id request', { qr_code_id: resolvedQrCodeId, mode: currentFormMode });
+                console.log('by_qr_code_id response', { status: resp.status, data });
+
+                if (!resp.ok) {
+                    // If not found, treat as create (should still allow submit)
+                    if (resp.status === 404) {
+                        setMessage('No student details found for this QR. You can enter new details.', '');
+                        return;
+                    }
+                    throw new Error(data.message || `Failed with status ${resp.status}`);
+                }
+
+
+                // Populate fields from students row.
+                // Expected student schema fields (best-effort mapping):
+                // name, dob, age, blood_group, address, guardian_name, relationship, guardian_contact
+                const d = data?.details || {};
+                console.log('by_qr_code_id response', { status: resp.status, data });
+
+
+
+                // Map backend fields to UI fields.
+                // Backend returns from /by_qr_code_id:
+                //   name, dob, age, blood_group, address, guardian_name, relationship, guardian_contact
+                // But current DB schema uses:
+                //   student_name, date_of_birth, contact_number (not address)
+                // app.py should now align; still support both key styles here.
+                const nameVal = d.name ?? d.student_name;
+                if (nameVal !== undefined) document.getElementById('name').value = nameVal;
+
+                const dobValRaw = d.dob ?? d.date_of_birth;
+                if (dobValRaw !== undefined) {
+                    let dobVal = dobValRaw;
+                    if (dobVal instanceof Date) dobVal = dobVal.toISOString().slice(0, 10);
+                    if (dobVal !== null && dobVal !== undefined) {
+                        document.getElementById('date-of-birth').value = String(dobVal);
+                    }
+                }
+
+                const bgVal = d.blood_group ?? d.bloodGroup;
+                if (bgVal !== undefined) document.getElementById('blood-group').value = bgVal;
+
+                // address may not exist in current schema; keep safe.
+                if (d.address !== undefined) document.getElementById('address').value = d.address;
+
+                const gnameVal = d.guardian_name ?? d.guardianName;
+                if (gnameVal !== undefined) document.getElementById('guardian-name').value = gnameVal;
+
+                const relVal = d.relationship ?? d.rel;
+                if (relVal !== undefined) document.getElementById('relationship').value = relVal;
+
+                const contactVal = d.guardian_contact ?? d.contact_number;
+                if (contactVal !== undefined) document.getElementById('guardian-contact').value = contactVal;
+
+                // guardian email isn't present in current backend schema; leave blank unless backend sends it.
+                const emailVal = d.guardian_email ?? d.email;
+                if (emailVal !== undefined && guardianEmailInput) guardianEmailInput.value = emailVal;
+
+
+                // Recompute age after setting DOB
+                updateAge();
+                updateSubmitState();
+
+                setMessage('Loaded existing details. You can update them and submit.', '');
+            } catch (e) {
+                console.error(e);
+                setMessage(String(e), 'error');
+            }
+        }
+
+        async function saveDetails(payload) {
+            // Create or update student details by qr_code_id
+            const endpoint = '/api/user/students/upsert_by_qr_code_id';
+
+            const response = await fetch(endpoint, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    qr_code_id: qrCodeId,
+                    ...payload
+                })
+            });
+
+            return response;
+        }
+
+
+        function calculateAge(dateOfBirth) {
+            const birthDate = new Date(dateOfBirth);
+            const today = new Date();
+            let age = today.getFullYear() - birthDate.getFullYear();
+            const monthDifference = today.getMonth() - birthDate.getMonth();
+            const hasBirthdayPassed =
+                monthDifference > 0 ||
+                (monthDifference === 0 && today.getDate() >= birthDate.getDate());
+
+            if (!hasBirthdayPassed) {
+                age -= 1;
+            }
+
+            return age;
+        }
+
+        function updateAge() {
+            if (!dateOfBirthInput.value) {
+                ageInput.value = '';
+                return;
+            }
+
+            const age = calculateAge(dateOfBirthInput.value);
+            ageInput.value = age >= 0 ? age : '';
+        }
+
+        guardianContactInput.addEventListener('input', () => {
+            guardianContactInput.value = guardianContactInput.value.replace(/\D/g, '').slice(0, 10);
+        });
+
+        // Basic input trimming for email
+        if (guardianEmailInput) {
+            guardianEmailInput.addEventListener('input', () => {
+                guardianEmailInput.value = guardianEmailInput.value.trim();
+            });
+        }
+
+        function updateSubmitState() {
+            // Enable submit ONLY when all required-for-submit fields are valid and filled.
+            // Explicitly ignore Address and Guardian's Email.
+            const requiredIds = [
+                'name',
+                'date-of-birth',
+                'age',
+                'blood-group',
+                'guardian-name',
+                'relationship',
+                'guardian-contact'
+            ];
+
+            const allValid = requiredIds.every((id) => {
+                const el = document.getElementById(id);
+                if (!el) return false;
+                // Use native constraint validation for correctness (e.g., pattern for contact)
+                if (typeof el.checkValidity === 'function' && !el.checkValidity()) return false;
+                // Additionally ensure a non-empty value for user-filled fields
+                if (el instanceof HTMLSelectElement) return !!el.value;
+                return String(el.value ?? '').trim().length > 0;
+            });
+
+            submitButton.disabled = !allValid;
+        }
+
+        function setMessage(message, type) {
+            formMessage.textContent = message;
+            formMessage.className = `form-message ${type || ''}`.trim();
+            if (message) {
+                formMessage.style.display = 'block';
+            } else {
+                formMessage.style.display = 'none';
+            }
+        }
+
+        function showQrCode(qrCode, formUrl) {
+            // Append timestamp to prevent caching issues
+            const qrImageUrl = `${qrCode}?v=${Date.now()}`;
+            qrImage.src = qrImageUrl;
+            qrLink.textContent = formUrl;
+            qrResult.classList.add('visible');
+        }
+
+        function clearQrCode() {
+            qrImage.removeAttribute('src');
+            qrLink.textContent = '';
+            qrResult.classList.remove('visible');
+        }
+
+        async function submitDetails(payload) {
+            const response = await fetch('/submit', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(payload)
+            });
+            return response;
+        }
+
+        function assertQrCodeIdOrThrow() {
+            if (!qrCodeId) {
+                throw new Error('Missing qr_code_id in URL. Open the form using the QR code link.');
+            }
+            const n = Number(qrCodeId);
+            if (!Number.isFinite(n) || String(Math.trunc(n)) !== String(qrCodeId).trim() && String(qrCodeId).trim() !== String(n)) {
+                // best-effort integer check; still allow things like "123".
+                throw new Error('Invalid qr_code_id in URL.');
+            }
+        }
+
+
+        dateOfBirthInput.addEventListener('change', () => {
+            updateAge();
+            updateSubmitState();
+        });
+
+        form.addEventListener('input', () => {
+            updateAge();
+            updateSubmitState();
+        });
+
+        form.addEventListener('change', updateSubmitState);
+        form.addEventListener('reset', () => {
+            setTimeout(() => {
+                updateAge();
+                updateSubmitState();
+                setMessage('', '');
+                clearQrCode();
+            }, 0);
+        });
+
+        form.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            updateAge();
+
+            // Since Address and Guardian's Email are optional, avoid native blocking validation
+            // for those fields. Use our own requiredIds gating instead.
+            if (submitButton.disabled) {
+                updateSubmitState();
+                return;
+            }
+
+
+            submitButton.disabled = true;
+            setMessage('Saving details...', '');
+            clearQrCode();
+
+            try {
+                // Map the date field correctly
+
+                assertQrCodeIdOrThrow();
+
+                const rawData = Object.fromEntries(new FormData(form));
+
+                // Treat optional fields as optional for validation.
+                // (Native constraint validation can still fail for empty optional fields in some cases.)
+                if (rawData['guardian-email'] === '') {
+                    rawData['guardian-email'] = '';
+                }
+                const payload = {
+                    name: rawData['name'],
+                    dob: rawData['date-of-birth'],
+                    age: parseInt(rawData['age']),
+                    blood_group: rawData['blood-group'],
+                    // DB schema uses `address` as NULLable, so keep empty string as NULL.
+                    address: (rawData['address'] || '').trim() || null,
+                    guardian_name: rawData['guardian-name'],
+                    relationship: rawData['relationship'],
+                    guardian_contact: rawData['guardian-contact'],
+                    // Backend currently ignores guardian_email anyway; keep as empty/undefined.
+                    guardian_email: (rawData['guardian-email'] || '').trim() || null
+                };
+
+                const response = await saveDetails(payload);
+
+                const result = await response.json().catch(() => ({}));
+
+                if (!response.ok) {
+                    throw new Error(result.message || 'Unable to save details.');
+                }
+
+                setMessage('Details saved successfully.', 'success');
+
+                // Redirect back to profile
+                window.location.href = '/userProfile.html';
+            } catch (error) {
+                console.error(error);
+                setMessage(error.message || 'Unable to save details. Please try again.', 'error');
+                submitButton.disabled = false;
+            } finally {
+                updateAge();
+                updateSubmitState();
+            }
+        });
+
+        updateAge();
+        updateSubmitState();
+
+        // In edit mode (Update details), load existing student details by qr_code_id.
+        loadExistingDetailsIfAny();
+    </script>
+</body>
+</html>

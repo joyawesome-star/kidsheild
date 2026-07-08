@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Admin Dashboard - QR Codes</title>
+  <style>
+    :root {
+      --bg: #1a1a2e;
+      --card: rgba(255, 255, 255, 0.08);
+      --border: rgba(255, 255, 255, 0.2);
+      --text: #ffffff;
+      --muted: rgba(255,255,255,0.75);
+      --accent1: #667eea;
+      --accent2: #764ba2;
+      --danger: #ff4d4d;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--bg);
+      color: var(--text);
+      font-family: "Segoe UI", Arial, sans-serif;
+      padding: 24px;
+    }
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .header {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+    h1 {
+      margin: 0;
+      font-size: 22px;
+      line-height: 1.2;
+    }
+    .sub {
+      margin-top: 6px;
+      color: var(--muted);
+      font-weight: 600;
+      font-size: 13px;
+    }
+    .controls {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+    .btn {
+      cursor: pointer;
+      border: 1px solid var(--border);
+      background: var(--card);
+      color: var(--text);
+      border-radius: 10px;
+      padding: 10px 14px;
+      font-weight: 700;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      user-select: none;
+    }
+    .btn.primary {
+      border: none;
+      background: linear-gradient(135deg, var(--accent1) 0%, var(--accent2) 100%);
+    }
+    .btn:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+    .tableWrap {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+    thead th {
+      background: rgba(255,255,255,0.06);
+      color: rgba(255,255,255,0.9);
+      text-align: left;
+      padding: 12px 12px;
+      border-bottom: 1px solid rgba(255,255,255,0.12);
+      white-space: nowrap;
+    }
+    tbody td {
+      padding: 12px 12px;
+      border-bottom: 1px solid rgba(255,255,255,0.10);
+      vertical-align: top;
+      color: rgba(255,255,255,0.92);
+      text-align: left;
+    }
+
+    .centerCol {
+      text-align: center !important;
+    }
+    tbody tr:hover td {
+      background: rgba(255,255,255,0.03);
+    }
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border: 1px solid rgba(255,255,255,0.18);
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.05);
+      color: rgba(255,255,255,0.9);
+      font-weight: 700;
+      font-size: 12px;
+    }
+    .muted {
+      color: var(--muted);
+      font-weight: 600;
+      font-size: 13px;
+    }
+    .downloadBtn {
+      border: none;
+      background: linear-gradient(135deg, var(--accent1) 0%, var(--accent2) 100%);
+      color: white;
+      font-weight: 800;
+      padding: 10px 12px;
+      border-radius: 10px;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 110px;
+    }
+    .pagination {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 14px;
+    }
+    .pagination .left,
+    .pagination .right{
+      display:flex;
+      align-items:center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .error {
+      margin-top: 12px;
+      padding: 12px;
+      background: rgba(255, 77, 77, 0.14);
+      border: 1px solid rgba(255, 77, 77, 0.35);
+      border-radius: 12px;
+      color: #ffd6d6;
+      font-weight: 700;
+      display: none;
+    }
+    .small {
+      font-size: 12px;
+      color: var(--muted);
+      font-weight: 600;
+    }
+    .qrThumb {
+      width: 62px;
+      height: 62px;
+      object-fit: contain;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 10px;
+      padding: 6px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div>
+        <h1>QR Codes Dashboard</h1>
+      </div>
+      <div class="controls">
+        <a class="btn" href="/generatequickResponseCode.html">Generate QR</a>
+        <button class="btn primary" id="refreshBtn" type="button">Refresh</button>
+        <button class="btn" id="logoutBtn" type="button" style="border-color: rgba(255,255,255,0.25);">Logout</button>
+      </div>
+
+    </div>
+
+    <div id="errorBox" class="error"></div>
+
+    <div class="tableWrap">
+      <div style="padding:14px 14px 0 14px; display:flex; gap:12px; align-items:center; justify-content:flex-start; flex-wrap:wrap;">
+        <label class="small" style="display:flex; flex-direction:column; gap:8px; align-items:flex-start; min-width:260px;">
+          <div style="display:flex; align-items:center; justify-content:space-between; width:100%;">
+            <span style="font-weight:800;">Search by ID</span>
+            <button
+              id="idSearchToggle"
+              type="button"
+              class="btn"
+              style="padding:6px 10px; border-radius:10px; font-weight:800;"
+              aria-label="Search by ID"
+            >
+              Search
+            </button>
+          </div>
+
+          <div id="idSearchBox" style="display:none; width:100%; margin-top:10px;">
+            <input
+              id="idSearchInput"
+              type="text"
+              placeholder="Enter id"
+              style="width: 100%; padding:10px 12px; border-radius:10px; border:1px solid rgba(255,255,255,0.18); background:rgba(255,255,255,0.06); color:white; font-weight:700;"
+            />
+            <div style="display:flex; gap:10px; margin-top:10px;">
+              <button
+                id="idSearchBtn"
+                type="button"
+                class="btn primary"
+                style="flex:1;"
+              >
+                Find
+              </button>
+              <button
+                id="idSearchClearBtn"
+                type="button"
+                class="btn"
+                style="flex:1;"
+              >
+                Clear
+              </button>
+            </div>
+          </div>
+        </label>
+
+        <label class="small" style="display:flex; gap:8px; align-items:center;">
+          <span>Created At:</span>
+          <select
+            id="createdAtSort"
+            style="background:rgba(255,255,255,0.06); color:white; border:1px solid rgba(255,255,255,0.18); border-radius:10px; padding:8px 10px; font-weight:700;"
+          >
+            <option value="desc">Newest to oldest</option>
+            <option value="asc">Oldest to newest</option>
+          </select>
+        </label>
+
+        <label class="small" style="display:flex; gap:8px; align-items:center;">
+          <span>Activated At:</span>
+          <select
+            id="activatedAtSort"
+            style="background:rgba(255,255,255,0.06); color:white; border:1px solid rgba(255,255,255,0.18); border-radius:10px; padding:8px 10px; font-weight:700;"
+          >
+            <option value="desc">Newest to oldest</option>
+            <option value="asc">Oldest to newest</option>
+          </select>
+        </label>
+
+        <label class="small" style="display:flex; gap:8px; align-items:center;">
+          <span>Is Sold:</span>
+          <select
+            id="isSoldFilter"
+            style="background:rgba(255,255,255,0.06); color:white; border:1px solid rgba(255,255,255,0.18); border-radius:10px; padding:8px 10px; font-weight:700;"
+          >
+            <option value="" style="background:rgba(255,255,255,0.06); color:white;">All</option>
+            <option value="yes" style="background:rgba(255,255,255,0.06); color:white;">Yes</option>
+            <option value="no" style="background:rgba(255,255,255,0.06); color:white;">No</option>
+          </select>
+        </label>
+
+        <label class="small" style="display:flex; gap:8px; align-items:center;">
+          <span>Is Activated:</span>
+          <select
+            id="isActivatedFilter"
+            style="background:rgba(255,255,255,0.06); color:white; border:1px solid rgba(255,255,255,0.18); border-radius:10px; padding:8px 10px; font-weight:700;"
+          >
+            <option value="" style="background:rgba(255,255,255,0.06); color:white;">All</option>
+            <option value="yes" style="background:rgba(255,255,255,0.06); color:white;">Yes</option>
+            <option value="no" style="background:rgba(255,255,255,0.06); color:white;">No</option>
+          </select>
+        </label>
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Is Sold</th>
+            <th>Is Activated</th>
+            <th>User ID</th>
+            <th>Activated At</th>
+            <th>Created At</th>
+            <th class="centerCol">QR</th>
+            <th class="centerCol">Actions</th>
+          </tr>
+        </thead>
+        <tbody id="rowsBody">
+          <!-- rows injected here -->
+        </tbody>
+      </table>
+
+      <div class="pagination">
+        <div class="left">
+          <button class="btn" id="prevBtn" type="button">Previous</button>
+          <button class="btn" id="nextBtn" type="button">Next</button>
+        </div>
+        <div class="right">
+          <div class="small" id="pageInfo">Page 1</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const PAGE_SIZE = 10;
+
+    function getQueryInt(name, fallback) {
+
+
+      const params = new URLSearchParams(window.location.search);
+      const raw = params.get(name);
+      if (raw === null || raw === undefined) return fallback;
+      const n = parseInt(raw, 10);
+      return Number.isFinite(n) ? n : fallback;
+    }
+
+    function setQueryParam(name, value) {
+      const url = new URL(window.location.href);
+      url.searchParams.set(name, value);
+      window.location.href = url.toString();
+    }
+
+    function showError(msg) {
+      const box = document.getElementById('errorBox');
+      box.style.display = 'block';
+      box.textContent = msg;
+    }
+
+    function hideError() {
+      const box = document.getElementById('errorBox');
+      box.style.display = 'none';
+      box.textContent = '';
+    }
+
+    function fmtBool(v) {
+      return v === true || v === "true" ? "Yes" : "No";
+    }
+
+    function fmtNull(v) {
+      return v === null || v === undefined || v === '' ? '-' : String(v);
+    }
+
+    function cardHtml(row) {
+      const imageUrl = row?.image_url || '';
+      return `
+        <tr>
+          <td style="font-weight:800;">${fmtNull(row?.id)}</td>
+          <td><span class="pill">${fmtBool(row?.is_sold)}</span></td>
+          <td><span class="pill">${fmtBool(row?.is_activated)}</span></td>
+          <td>${fmtNull(row?.user_id)}</td>
+          <td>${fmtNull(row?.activated_at)}</td>
+          <td>${fmtNull(row?.created_at)}</td>
+          <td class="centerCol">
+            ${imageUrl ? `<img class="qrThumb" src="${imageUrl}" alt="QR" />` : `<div class="small">N/A</div>`}
+          </td>
+          <td class="centerCol">
+            <div style="display:flex; gap:10px; align-items:center; justify-content:center; flex-wrap:wrap;">
+              <a class="downloadBtn" href="/download_single_qr?id=${encodeURIComponent(row?.id || '')}" style="min-width:110px;">Download</a>
+              <button
+                class="btn"
+                style="padding:10px 12px; border-radius:10px; font-weight:900; border:1px solid rgba(255,255,255,0.25); min-width:140px;"
+                type="button"
+                onclick="markAsSold(${encodeURIComponent(row?.id || '')})"
+                ${row?.is_sold === true || row?.is_sold === "true" ? 'disabled' : ''}
+                id="markSoldBtn-${encodeURIComponent(row?.id || '')}"
+              >
+                ${row?.is_sold === true || row?.is_sold === "true" ? 'Sold' : 'Mark as Sold'}
+              </button>
+            </div>
+          </td>
+        </tr>
+      `;
+    }
+
+    async function loadPage(page) {
+      hideError();
+
+      const rowsBody = document.getElementById('rowsBody');
+      rowsBody.innerHTML = `<tr><td colspan="8" class="muted">Loading...</td></tr>`;
+
+      const createdAtSortEl = document.getElementById('createdAtSort');
+      const activatedAtSortEl = document.getElementById('activatedAtSort');
+      const isSoldFilterEl = document.getElementById('isSoldFilter');
+      const isActivatedFilterEl = document.getElementById('isActivatedFilter');
+
+      const created_at_order = createdAtSortEl?.value || 'desc';
+      const activated_at_order = activatedAtSortEl?.value || 'desc';
+
+      const params = new URLSearchParams(window.location.search);
+      const id = (params.get('id') || '').trim();
+
+      const is_sold = isSoldFilterEl?.value || '';
+      const is_activated = isActivatedFilterEl?.value || '';
+
+      let url = `/api/admin/qr_codes?page=${encodeURIComponent(page)}&page_size=${encodeURIComponent(PAGE_SIZE)}&created_at_order=${encodeURIComponent(created_at_order)}&activated_at_order=${encodeURIComponent(activated_at_order)}`;
+      if (id) {
+        url += `&id=${encodeURIComponent(id)}`;
+      }
+      if (is_sold) {
+        url += `&is_sold=${encodeURIComponent(is_sold)}`;
+      }
+      if (is_activated) {
+        url += `&is_activated=${encodeURIComponent(is_activated)}`;
+      }
+
+      const res = await fetch(url);
+      if (!res.ok) {
+        if (res.status === 401) {
+          window.location.href = '/adminLogin.html';
+          return;
+        }
+        const text = await res.text();
+        throw new Error(text || `Request failed with status ${res.status}`);
+      }
+
+
+      const data = await res.json();
+      const rows = Array.isArray(data?.rows) ? data.rows : [];
+      const total = typeof data?.total === 'number' ? data.total : 0;
+      const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+
+      rowsBody.innerHTML = rows.length ? rows.map(cardHtml).join('') : `
+        <tr><td colspan="8" class="muted">No QR codes found.</td></tr>
+      `;
+
+      document.getElementById('pageInfo').textContent = `Page ${page} of ${totalPages}`;
+
+      document.getElementById('prevBtn').disabled = page <= 1;
+      document.getElementById('nextBtn').disabled = page >= totalPages;
+    }
+
+    async function markAsSold(id) {
+      if (!id && id !== 0) return;
+
+      const btn = document.getElementById(`markSoldBtn-${id}`);
+      if (btn) {
+        btn.disabled = true;
+        const prev = btn.textContent;
+        btn.dataset.prevText = prev;
+        btn.textContent = 'Updating...';
+      }
+
+      // Simple dialogue using browser prompts (avoid large UI changes)
+      try {
+        const mode = (window.prompt('Mark as Sold: type "existing" to use an existing user, or "new" to create a new user.') || '').trim().toLowerCase();
+
+        if (mode !== 'existing' && mode !== 'new') {
+          throw new Error('Please enter "existing" or "new".');
+        }
+
+        if (mode === 'existing') {
+          const email = (window.prompt('Enter the user email for this QR code:') || '').trim();
+          if (!email) throw new Error('Email is required.');
+
+          const res = await fetch(`/api/admin/qr_codes/mark_sold?id=${encodeURIComponent(id)}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id, flow: 'existing', email })
+          });
+
+          if (!res.ok) {
+            const text = await res.text().catch(() => '');
+            throw new Error(text || `Update failed with status ${res.status}`);
+          }
+
+          window.location.reload();
+          return;
+        }
+
+        // mode === 'new'
+        // Redirect to signup page, keeping qr_code_id so it can attach after signup.
+        const url = new URL('/usersignup.html', window.location.origin);
+        url.searchParams.set('qr_code_id', String(id));
+        url.searchParams.set('source', 'admin_dashboard');
+        window.location.href = url.toString();
+      } catch (e) {
+        const msg = String(e);
+        if (btn) {
+          btn.textContent = btn.dataset.prevText || 'Mark as Sold';
+        }
+        const box = document.getElementById('errorBox');
+        box.style.display = 'block';
+        box.textContent = msg;
+        return;
+      }
+    }
+
+    (function init() {
+      const refreshBtn = document.getElementById('refreshBtn');
+      const prevBtn = document.getElementById('prevBtn');
+      const nextBtn = document.getElementById('nextBtn');
+
+      const createdAtSortEl = document.getElementById('createdAtSort');
+      const activatedAtSortEl = document.getElementById('activatedAtSort');
+      const isSoldFilterEl = document.getElementById('isSoldFilter');
+      const isActivatedFilterEl = document.getElementById('isActivatedFilter');
+
+      let page = getQueryInt('page', 1);
+      page = Math.max(1, page);
+
+      // Initialize dropdowns from query params (defaults: desc / All)
+      const params = new URLSearchParams(window.location.search);
+
+      const createdRaw = params.get('created_at_order');
+      const activatedRaw = params.get('activated_at_order');
+      const isSoldRaw = params.get('is_sold') || '';
+      const isActivatedRaw = params.get('is_activated') || '';
+
+      if (createdAtSortEl) createdAtSortEl.value = (createdRaw === 'asc' || createdRaw === 'desc') ? createdRaw : 'desc';
+      if (activatedAtSortEl) activatedAtSortEl.value = (activatedRaw === 'asc' || activatedRaw === 'desc') ? activatedRaw : 'desc';
+      if (isSoldFilterEl) isSoldFilterEl.value = (isSoldRaw === 'yes' || isSoldRaw === 'no') ? isSoldRaw : '';
+      if (isActivatedFilterEl) isActivatedFilterEl.value = (isActivatedRaw === 'yes' || isActivatedRaw === 'no') ? isActivatedRaw : '';
+
+      function updateSortParamAndReload() {
+        if (!createdAtSortEl || !activatedAtSortEl) return;
+
+        const url = new URL(window.location.href);
+        url.searchParams.set('created_at_order', createdAtSortEl.value);
+        url.searchParams.set('activated_at_order', activatedAtSortEl.value);
+
+        url.searchParams.set('page', '1'); // reset to page 1 after filter/sort change
+        window.location.href = url.toString();
+      }
+
+      function updateSoldActivatedFilterAndReload() {
+        const url = new URL(window.location.href);
+
+        const soldVal = isSoldFilterEl?.value || '';
+        const actVal = isActivatedFilterEl?.value || '';
+
+        if (soldVal) url.searchParams.set('is_sold', soldVal);
+        else url.searchParams.delete('is_sold');
+
+        if (actVal) url.searchParams.set('is_activated', actVal);
+        else url.searchParams.delete('is_activated');
+
+        url.searchParams.set('page', '1');
+        window.location.href = url.toString();
+      }
+
+      const idSearchToggle = document.getElementById('idSearchToggle');
+      const idSearchBox = document.getElementById('idSearchBox');
+      const idSearchInput = document.getElementById('idSearchInput');
+      const idSearchBtn = document.getElementById('idSearchBtn');
+      const idSearchClearBtn = document.getElementById('idSearchClearBtn');
+
+      function updateIdSearchUIFromQuery() {
+        const params = new URLSearchParams(window.location.search);
+        const idVal = (params.get('id') || '').trim();
+        if (!idVal) return;
+
+        if (idSearchBox) idSearchBox.style.display = 'block';
+        if (idSearchInput) idSearchInput.value = idVal;
+      }
+
+      function setIdSearchParamAndReload(idValue) {
+        const url = new URL(window.location.href);
+
+        const v = (idValue || '').trim();
+        if (v) {
+          url.searchParams.set('id', v);
+        } else {
+          url.searchParams.delete('id');
+        }
+
+        url.searchParams.set('page', '1'); // reset to page 1 after filter changes
+        window.location.href = url.toString();
+      }
+
+      if (idSearchToggle) {
+        idSearchToggle.addEventListener('click', () => {
+          if (!idSearchBox) return;
+          const isOpen = idSearchBox.style.display !== 'none';
+          idSearchBox.style.display = isOpen ? 'none' : 'block';
+          if (isOpen && idSearchInput) idSearchInput.focus();
+        });
+      }
+
+      if (idSearchBtn) {
+        idSearchBtn.addEventListener('click', () => {
+          const v = idSearchInput?.value || '';
+          if (!v.trim()) {
+            setIdSearchParamAndReload('');
+            return;
+          }
+          setIdSearchParamAndReload(v);
+        });
+      }
+
+      if (idSearchClearBtn) {
+        idSearchClearBtn.addEventListener('click', () => {
+          if (idSearchInput) idSearchInput.value = '';
+          setIdSearchParamAndReload('');
+        });
+      }
+
+      if (idSearchInput) {
+        idSearchInput.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            const v = idSearchInput?.value || '';
+            setIdSearchParamAndReload(v);
+          }
+        });
+      }
+
+      updateIdSearchUIFromQuery();
+
+      refreshBtn.addEventListener('click', () => loadPage(page).catch(e => showError(String(e))));
+
+      prevBtn.addEventListener('click', () => setQueryParam('page', Math.max(1, page - 1)));
+      nextBtn.addEventListener('click', () => setQueryParam('page', page + 1));
+
+      if (createdAtSortEl) createdAtSortEl.addEventListener('change', updateSortParamAndReload);
+      if (activatedAtSortEl) activatedAtSortEl.addEventListener('change', updateSortParamAndReload);
+
+      if (isSoldFilterEl) isSoldFilterEl.addEventListener('change', updateSoldActivatedFilterAndReload);
+      if (isActivatedFilterEl) isActivatedFilterEl.addEventListener('change', updateSoldActivatedFilterAndReload);
+
+      document.getElementById('logoutBtn').addEventListener('click', async () => {
+        try {
+          await fetch('/logout', { method: 'POST' });
+        } catch (e) {
+          // ignore
+        }
+        window.location.href = '/welcome.html';
+      });
+
+      loadPage(page).catch(e => showError(String(e)));
+    })();
+
+  </script>
+</body>
+</html>

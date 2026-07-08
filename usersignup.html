@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Sign Up - QR Code Generator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: url('kidshield-bg.jpg') center/contain no-repeat fixed;
+            background-color: #1a1a2e;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .signup-container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.4);
+            width: 100%;
+            max-width: 450px;
+            padding: 50px 40px;
+            position: relative;
+            z-index: 1;
+            color: white;
+        }
+
+        .signup-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .signup-header h1 {
+            color: white;
+            font-size: 2.2em;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .signup-header p {
+            color: #a5b4fc;
+            font-size: 0.95em;
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            color: rgba(255, 255, 255, 0.9);
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 0.95em;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            font-size: 1em;
+            color: white;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            background: rgba(255, 255, 255, 0.1);
+            border-color: #764ba2;
+            box-shadow: 0 0 10px rgba(118, 75, 162, 0.3);
+        }
+
+        .form-group input::placeholder {
+            color: rgba(255, 255, 255, 0.3);
+        }
+
+        .signup-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .signup-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(118, 75, 162, 0.4);
+            filter: brightness(1.1);
+        }
+
+        .signup-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .row-inline {
+            display: flex;
+            gap: 12px;
+            align-items: flex-end;
+        }
+
+        .row-inline .col {
+            flex: 1;
+        }
+
+        .row-inline .col-auto {
+            flex: 0 0 140px;
+        }
+
+        .otp-action-btn {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .otp-action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(118, 75, 162, 0.4);
+            filter: brightness(1.1);
+        }
+
+        .otp-action-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .otp-section {
+            display: none;
+            margin-top: -10px;
+            margin-bottom: 25px;
+        }
+
+        .otp-section.show {
+            display: block;
+        }
+
+        /* Modal */
+        .modal-backdrop {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.6);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            z-index: 999;
+        }
+
+        .modal-backdrop.show {
+            display: flex;
+        }
+
+        .modal-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.4);
+            width: 100%;
+            max-width: 420px;
+            padding: 35px 28px;
+            position: relative;
+            color: white;
+        }
+
+        .modal-header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .modal-header h2 {
+            font-size: 1.6em;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .modal-header p {
+            margin-top: 8px;
+            color: #a5b4fc;
+            font-size: 0.95em;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 18px;
+        }
+
+        .modal-close-btn {
+            flex: 1;
+            padding: 12px;
+            background: transparent;
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .modal-close-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: white;
+        }
+
+        .footer-section {
+            text-align: center;
+            margin-top: 25px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .footer-section a {
+            color: #a5b4fc;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.95em;
+            transition: color 0.3s ease;
+        }
+
+        .footer-section a:hover {
+            color: white;
+            text-decoration: underline;
+        }
+
+        .message {
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            font-size: 0.9em;
+            display: none;
+            border-left: 4px solid transparent;
+        }
+
+        .message.error {
+            display: block;
+            background: rgba(255, 0, 0, 0.15);
+            color: #ff9999;
+            border-color: #ff4d4d;
+        }
+
+        .message.success {
+            display: block;
+            background: rgba(0, 255, 0, 0.1);
+            color: #99ff99;
+            border-color: #4dff4d;
+        }
+
+        @media (max-width: 480px) {
+            .signup-container {
+                padding: 40px 25px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="signup-container">
+        <div class="signup-header">
+            <h1>Create Account</h1>
+            <p>Join KidShield Community</p>
+        </div>
+
+        <div id="statusMessage" class="message"></div>
+
+        <form id="signupForm">
+            <div class="form-group">
+                <label for="name">Name</label>
+                <input type="text" id="name" name="name" placeholder="Enter your name" required>
+            </div>
+
+            <div class="form-group">
+                <label for="email">Email Address</label>
+                <input type="email" id="email" name="email" placeholder="Enter your email" required>
+            </div>
+
+            <div class="form-group row-inline">
+                <div class="col">
+                    <label for="contactNo">Contact Number</label>
+                    <input
+                        type="text"
+                        id="contactNo"
+                        name="contactNo"
+                        placeholder="+91XXXXXXXXXX"
+                        autocomplete="tel"
+                        inputmode="tel"
+                        pattern="^\+91\d{10}$"
+                        maxlength="13"
+                        required
+                        style="width: 100%;"
+                    value="+91"
+                    >
+                    <div style="margin-top: 8px; font-size: 0.85em; color: rgba(165, 180, 252, 0.9); font-weight: 600;">
+                        Enter 10-digit number after +91
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" placeholder="Min. 6 characters" required>
+            </div>
+
+            <div class="form-group">
+                <label for="confirmPassword">Confirm Password</label>
+                <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Repeat your password" required>
+            </div>
+
+            <button type="submit" class="signup-btn" id="signupBtn" disabled>Create Account</button>
+
+            <div class="footer-section">
+                <a href="userLogin.html">Already have an account? Sign In</a>
+            </div>
+        </form>
+
+        <!-- Modal -->
+        <div class="modal-backdrop" id="otpModalBackdrop">
+            <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="otpModalTitle">
+                <div class="modal-header">
+                    <h2 id="otpModalTitle">Verify OTP</h2>
+                    <p>Enter the OTP sent to your number</p>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 18px;">
+                    <label for="otpModalInput">OTP Code</label>
+                    <input type="text" id="otpModalInput" name="otpModalInput" placeholder="6-digit OTP" required>
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" class="modal-close-btn" id="otpModalCloseBtn">Close</button>
+                    <button type="button" class="otp-action-btn" id="otpModalVerifyBtn" style="flex:1;">Verify OTP</button>
+                </div>
+
+                <div id="otpModalMessage" class="message" style="margin-top: 18px; display:none;"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const signupForm = document.getElementById('signupForm');
+        const signupBtn = document.getElementById('signupBtn');
+        const statusMessage = document.getElementById('statusMessage');
+
+        const contactNoInput = document.getElementById('contactNo');
+
+        const otpModalBackdrop = document.getElementById('otpModalBackdrop');
+        const otpModalInput = document.getElementById('otpModalInput');
+        const otpModalMessage = document.getElementById('otpModalMessage');
+        const otpModalCloseBtn = document.getElementById('otpModalCloseBtn');
+        const otpModalVerifyBtn = document.getElementById('otpModalVerifyBtn');
+
+
+        // session-level state
+        let normalizedContactNo = '';
+
+
+
+        function showStatus(msg, type) {
+            statusMessage.textContent = msg;
+            statusMessage.className = `message ${type}`;
+        }
+
+        function showOtpModalMessage(msg, type) {
+            otpModalMessage.textContent = msg;
+            otpModalMessage.className = `message ${type || ''}`;
+            otpModalMessage.style.display = 'block';
+        }
+
+        function clearOtpModalMessage() {
+            otpModalMessage.textContent = '';
+            otpModalMessage.className = 'message';
+            otpModalMessage.style.display = 'none';
+        }
+
+        function openOtpModal() {
+            clearOtpModalMessage();
+            otpModalBackdrop.classList.add('show');
+            otpModalInput.value = '';
+            otpModalInput.focus();
+        }
+
+        function closeOtpModal() {
+            otpModalBackdrop.classList.remove('show');
+            clearOtpModalMessage();
+        }
+
+        function normalizeContactNo(value) {
+            if (!value) return '';
+            let c = String(value).trim();
+
+            if (c.startsWith('00')) {
+                c = '+' + c.slice(2);
+            }
+            if (!c.startsWith('+') && c.length === 10 && /^\d{10}$/.test(c)) {
+                c = '+91' + c;
+            }
+            // accept +91XXXXXXXXXX only
+            if (!c.startsWith('+91')) return '';
+            const digits = c.slice(3);
+            if (!/^\d{10}$/.test(digits)) return '';
+            return '+91' + digits;
+        }
+
+        function validatePassword() {
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+
+            if (password.length < 6) {
+                showStatus('Password must be at least 6 characters long', 'error');
+                return false;
+            }
+            if (password !== confirmPassword) {
+                showStatus('Passwords do not match', 'error');
+                return false;
+            }
+            return true;
+        }
+
+        function validateAndMaybeEnableSignup() {
+            // OTP disabled; enable signup once contact no is normalized.
+            if (normalizedContactNo) {
+                signupBtn.disabled = false;
+            }
+        }
+
+        // Enable signup as soon as contact number is normalized (OTP disabled)
+        contactNoInput.addEventListener('blur', () => {
+            const normalized = normalizeContactNo(contactNoInput.value);
+            if (normalized) {
+                normalizedContactNo = normalized;
+                validateAndMaybeEnableSignup();
+            }
+        });
+
+
+
+        // Restrict contact number input: default to +91 and allow only 10 digits after it
+        const DEFAULT_DIAL_CODE = '+91';
+        function enforceContactNoUI() {
+            let v = contactNoInput.value || '';
+
+            // Remove everything except digits and '+'
+            v = v.replace(/[^0-9+]/g, '');
+
+            // Ensure it starts with +91 (not editable by user in practice)
+            if (!v.startsWith(DEFAULT_DIAL_CODE)) {
+                v = DEFAULT_DIAL_CODE;
+            }
+
+            // Keep only digits after +91 and limit to 10
+            const digits = v.slice(DEFAULT_DIAL_CODE.length).replace(/\D/g, '').slice(0, 10);
+            contactNoInput.value = DEFAULT_DIAL_CODE + digits;
+
+            // Since OTP is disabled, just re-evaluate signup enablement
+            normalizedContactNo = normalizeContactNo(contactNoInput.value);
+            validateAndMaybeEnableSignup();
+        }
+
+
+        // Set default value on load
+        contactNoInput.value = DEFAULT_DIAL_CODE;
+
+        contactNoInput.addEventListener('input', enforceContactNoUI);
+        contactNoInput.addEventListener('focus', () => {
+
+            if (!contactNoInput.value.startsWith(DEFAULT_DIAL_CODE)) {
+                contactNoInput.value = DEFAULT_DIAL_CODE;
+            }
+            // Put cursor after +91
+            try {
+                const pos = contactNoInput.value.length;
+                contactNoInput.setSelectionRange(pos, pos);
+            } catch (_) {}
+        });
+
+        // OTP UI elements (currently OTP is disabled server-side)
+        // The corresponding buttons are not present in the provided HTML,
+        // so OTP handlers are only attached if those elements exist.
+        const sendOtpBtn = document.getElementById('sendOtpBtn');
+
+        if (sendOtpBtn) {
+            sendOtpBtn.addEventListener('click', async () => {
+                const contactRaw = contactNoInput.value;
+                const normalized = normalizeContactNo(contactRaw);
+
+                if (!normalized) {
+                    showStatus('Enter a valid contact number in +91XXXXXXXXXX format', 'error');
+                    return;
+                }
+
+                normalizedContactNo = normalized;
+                signupBtn.disabled = true;
+                signupBtn.textContent = 'Sending OTP...';
+                sendOtpBtn.disabled = true;
+
+                try {
+                    const resp = await fetch('/send_otp', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ contact_no: normalized })
+                    });
+
+                    const data = await resp.json();
+
+                    if (!resp.ok) {
+                        showStatus(data.message || 'Failed to send OTP', 'error');
+                        signupBtn.textContent = 'Create Account';
+                        return;
+                    }
+
+                    // show OTP popup
+                    openOtpModal();
+                } catch (err) {
+                    console.error(err);
+                    showStatus('Connection error. Please try again.', 'error');
+                } finally {
+                    sendOtpBtn.disabled = false;
+                    signupBtn.textContent = 'Create Account';
+                    signupBtn.disabled = false;
+                }
+            });
+        }
+
+        // Signup submit -> insert into public.users -> redirect to userLogin.html
+        signupForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const name = document.getElementById('name').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+
+            if (!name || !email || !password || !confirmPassword) {
+                showStatus('Please fill in all fields', 'error');
+                return;
+            }
+
+            if (!validatePassword()) return;
+
+            const contactNo = normalizedContactNo || normalizeContactNo(contactNoInput.value);
+            if (!contactNo) {
+                showStatus('Enter a valid contact number in +91XXXXXXXXXX format', 'error');
+                return;
+            }
+
+            signupBtn.disabled = true;
+            signupBtn.textContent = 'Creating account...';
+
+            try {
+                const resp = await fetch('/user_signup_action', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        name,
+                        email,
+                        password,
+                        contact_no: contactNo
+                    })
+                });
+
+                const data = await resp.json();
+
+                if (!resp.ok) {
+                    showStatus(data.message || 'Signup failed', 'error');
+                    signupBtn.disabled = false;
+                    signupBtn.textContent = 'Create Account';
+                    return;
+                }
+
+                const qrCodeId = new URLSearchParams(window.location.search).get('qr_code_id');
+
+                if (qrCodeId) {
+                    // If signup was triggered from admin "Mark as Sold", attach the QR after user creation.
+                    try {
+                        const attachResp = await fetch('/api/admin/qr_codes/attach_sold_to_user', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                id: String(qrCodeId),
+                                // use returned user_id from backend
+                                user_id: (data && data.user_id) ? data.user_id : null
+                            })
+                        });
+
+                        const attachData = await attachResp.json().catch(() => ({}));
+                        if (!attachResp.ok) {
+                            throw new Error(attachData.message || 'Failed to attach QR to user');
+                        }
+
+                        // Back to admin dashboard
+                        window.location.href = '/admin_dashboard.html';
+                        return;
+                    } catch (attachErr) {
+                        console.error(attachErr);
+                        showStatus(String(attachErr), 'error');
+                        signupBtn.disabled = false;
+                        signupBtn.textContent = 'Create Account';
+                        return;
+                    }
+                }
+
+                // Default success behavior
+                alert('Account created successfully, please login now');
+                window.location.href = '/userLogin.html';
+            } catch (err) {
+                console.error(err);
+                showStatus('Connection error. Please try again.', 'error');
+                signupBtn.disabled = false;
+                signupBtn.textContent = 'Create Account';
+            }
+        });
+
+    </script>
+
+</body>
+</html>
+
