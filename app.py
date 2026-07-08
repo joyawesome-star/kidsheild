@@ -843,9 +843,11 @@ def create_app():
                 if not qr_unique_id_raw:
                     return jsonify({"message": "qr_code_id or qr_unique_id is required"}), 400
 
+                safe_q = str(qr_unique_id_raw).replace("'", "''")
                 rows = get_query_result(
-                    f"SELECT id FROM public.\"qr_codes\" WHERE qr_unique_id = '{str(qr_unique_id_raw).replace("'", "''")}' LIMIT 1;"
+                    f"SELECT id FROM public.\"qr_codes\" WHERE qr_unique_id = '{safe_q}' LIMIT 1;"
                 )
+
                 if not rows:
                     return jsonify({"message": "QR not found"}), 404
                 qr_code_id = int(rows[0][0])
