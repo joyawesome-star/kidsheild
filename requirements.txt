@@ -3,6 +3,7 @@ SQLAlchemy==2.0.34
 qrcode==7.4.2
 Pillow==10.4.0
 python-dotenv==1.0.1
-psycopg[binary]==3.2.1
+psycopg[binary]==3.3.4
+
 
 
