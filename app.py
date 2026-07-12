@@ -343,6 +343,20 @@ def create_app():
             if not isinstance(password, str) or len(password) < 6:
                 return jsonify({"success": False, "message": "Password must be at least 6 characters"}), 400
 
+            admin_user = (os.environ.get("ADMIN_USER") or "").strip()
+            admin_pass = os.environ.get("ADMIN_PASSWORD") or ""
+
+            # 1) Environment-based admin login (recommended for Render)
+            if admin_user and admin_pass:
+                if user_id == admin_user and password == admin_pass:
+                    session.clear()
+                    session["role"] = "admin"
+                    session["user_id"] = user_id
+                    _touch_session()
+                    return jsonify({"success": True, "message": "Admin login successful."}), 200
+                return jsonify({"success": False, "message": "Invalid credentials."}), 401
+
+            # 2) Fallback: DB-based lookup (legacy behavior)
             existing = get_query_result(
                 "SELECT id FROM public.users WHERE (id::text = '{uid}' OR name = '{uid}' OR email = '{uid}') "
                 "AND password = '{pwd}' LIMIT 1;".format(
@@ -353,6 +367,7 @@ def create_app():
 
             if not existing:
                 return jsonify({"success": False, "message": "Invalid credentials."}), 401
+
 
             session.clear()
             session["role"] = "admin"
