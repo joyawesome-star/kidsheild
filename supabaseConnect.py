@@ -3,31 +3,30 @@ from sqlalchemy import create_engine, text
 
 DATABASE_URL = os.environ.get("DATABASE_URL")
 
+# Allow app.py to load envFile.txt before importing this module.
+# On Render, prefer setting DATABASE_URL in Render Environment.
 if not DATABASE_URL:
-    raise RuntimeError("DATABASE_URL is not set. Ensure envFile.txt is loaded before importing supabaseConnect.py.")
+    # Avoid hard-crashing at import-time; caller will log/handle failures.
+    engine = None
+else:
+    engine = create_engine(DATABASE_URL)
 
-engine = create_engine(DATABASE_URL)
 
 
 def get_query_result(sql_query):
-    """
-    Connect to Supabase database and execute SQL query
-    
-    Args:
-        sql_query: SQL query string to execute
-        
-    Returns:
-        Query result if successful, None otherwise
-    """
+    """Execute a SELECT and return rows (or None on error)."""
     try:
+        if engine is None:
+            print("Supabase engine not initialized (DATABASE_URL missing).")
+            return None
         conn = engine.connect()
         result = conn.execute(text(sql_query))
         conn.close()
         return result.fetchall()
-        
     except Exception as e:
         print(f"Error connecting to Supabase database: {e}")
         return None
+
 
 def execute_query(sql_query):
     """Execute SQL query (INSERT, UPDATE, DELETE).
