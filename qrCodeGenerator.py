@@ -7,8 +7,8 @@ import qrcode
 from sqlalchemy import create_engine, text
 
 # --- DB connection (as provided by user) ---
-DATABASE_URL = "postgresql://postgres:m4JFPkWCxOtBayj7@db.yjakxhhmesbncbxmibfp.supabase.co:5432/postgres"
-_engine = create_engine(DATABASE_URL)
+DATABASE_URL = "postgresql://postgres.yjakxhhmesbncbxmibfp:m4JFPkWCxOtBayj7@aws-1-ap-northeast-2.pooler.supabase.com:6543/postgres"
+_engine = create_engine(DATABASE_URL, pool_pre_ping=True)
 
 # --- QR code configuration ---
 # Store images inside this project folder at: QR code project/qrCodes
