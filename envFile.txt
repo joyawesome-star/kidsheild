@@ -1,4 +1,7 @@
-DATABASE_URL=postgresql://postgres:m4JFPkWCxOtBayj7@db.yjakxhhmesbncbxmibfp.supabase.co:5432/postgres
+PYTHON_VERSION=3.14
+DATABASE_URL=postgresql://postgres.yjakxhhmesbncbxmibfp:m4JFPkWCxOtBayj7@aws-1-ap-northeast-2.pooler.supabase.com:6543/postgres
+ADMIN_USER=admin
+ADMIN_PASSWORD=admin123
 
 MSG91_AUTH_KEY=544825Ai6Vy7Sy6a413045P1
 MSG91_FLOW_ID=6a414ece6773ab55cb053d56
