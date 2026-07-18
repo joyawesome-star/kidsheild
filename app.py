@@ -392,7 +392,12 @@ def create_app():
             if quantity < 1 or quantity > 100:
                 return jsonify({"message": "quantity must be between 1 and 100"}), 400
 
-            result = generate_bulk_qr_codes(quantity)
+            # generate_bulk_qr_codes uses DB; provide clearer error for Render networking issues
+            try:
+                result = generate_bulk_qr_codes(quantity)
+            except Exception as e:
+                return jsonify({"message": f"Failed generating QR codes due to DB/network error: {e}"}), 500
+
             if not result:
                 return jsonify({"message": "Error generating QR codes"}), 500
 
