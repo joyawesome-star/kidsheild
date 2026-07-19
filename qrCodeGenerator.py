@@ -13,13 +13,21 @@ _engine = create_engine(DATABASE_URL, pool_pre_ping=True)
 # --- QR code configuration ---
 # Store images inside this project folder at: QR code project/qrCodes
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-QR_CODE_FOLDER = os.path.join(BASE_DIR, "qrCodes")
+
+# Save QR images into the local cloned GitHub repo so they appear in:
+# https://github.com/joyawesome-star/kidsheild/tree/41c197abd8186bfa0f9b2cbeb37a6daa6dc06ce5/qrCodes
+GITHUB_QRCODES_DIR = os.path.join("C:/Users/Joy/kidsheild", "qrCodes")
+QR_CODE_FOLDER = GITHUB_QRCODES_DIR
 QR_CODE_SIZE = 10  # Box size
 QR_CODE_BORDER = 5  # Border size in boxes
 
 
 def ensure_qr_folder() -> None:
     os.makedirs(QR_CODE_FOLDER, exist_ok=True)
+
+    # Sanity check: folder should exist and be writable-ish.
+    if not os.path.isdir(QR_CODE_FOLDER):
+        raise RuntimeError(f"QR_CODE_FOLDER is not a directory: {QR_CODE_FOLDER}")
 
 
 def _insert_qr_row_and_get_new_id() -> int:
@@ -140,6 +148,10 @@ def generate_qr_code_with_db() -> Optional[Dict[str, Any]]:
             form_url = f"/studentForm.html?qr_code_id={qr_id}&mode=edit"
 
         _generate_qr_image(data=form_url, output_path=file_path)
+
+        # Sanity check: verify file got written
+        if not os.path.exists(file_path):
+            raise RuntimeError(f"QR image file not created: {file_path}")
 
 
         _update_qr_file_fields(
