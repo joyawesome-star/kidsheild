@@ -14,10 +14,10 @@ _engine = create_engine(DATABASE_URL, pool_pre_ping=True)
 # Store images inside this project folder at: QR code project/qrCodes
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
-# Save QR images into the local cloned GitHub repo so they appear in:
-# https://github.com/joyawesome-star/kidsheild/tree/41c197abd8186bfa0f9b2cbeb37a6daa6dc06ce5/qrCodes
-GITHUB_QRCODES_DIR = os.path.join("C:/Users/Joy/kidsheild", "qrCodes")
-QR_CODE_FOLDER = GITHUB_QRCODES_DIR
+# Save QR images inside this Flask project so DB `file_path` and Flask URL building live on the same drive.
+# The admin/user dashboards expect these images to be served from the project folder.
+QR_CODE_FOLDER = os.path.join(BASE_DIR, "qrCodes")
+
 QR_CODE_SIZE = 10  # Box size
 QR_CODE_BORDER = 5  # Border size in boxes
 
@@ -138,16 +138,20 @@ def generate_qr_code_with_db() -> Optional[Dict[str, Any]]:
         file_name = f"{qr_unique_id}.jpg"
         file_path = os.path.join(QR_CODE_FOLDER, file_name)
 
-        # QR payload MUST be a full URL with query params so studentForm.html can load data.
+        # QR payload MUST be a full URL with query params.
+        # Use `mode=view` so studentForm.html loads in readonly mode.
         # The frontend uses `qr_code_id` (public.qr_codes.id) to query:
         #   /api/user/students/by_qr_code_id
         # and that endpoint supports numeric id.
-        form_url = f"{os.environ.get('STUDENT_FORM_BASE_URL', '').rstrip('/')}/studentForm.html?qr_code_id={qr_id}&mode=view"
-        if not os.environ.get('STUDENT_FORM_BASE_URL'):
-            # Fallback to relative URL (works if QR is scanned inside same origin)
-            form_url = f"/studentForm.html?qr_code_id={qr_id}&mode=edit"
+        student_form_base = os.environ.get('STUDENT_FORM_BASE_URL', '').strip().rstrip('/')
+        if student_form_base:
+            form_url = f"{student_form_base}/studentForm.html?qr_code_id={qr_id}&mode=view"
+        else:
+            # Fallback for local/testing (works if QR is scanned inside same origin)
+            form_url = f"/studentForm.html?qr_code_id={qr_id}&mode=view"
 
         _generate_qr_image(data=form_url, output_path=file_path)
+
 
         # Sanity check: verify file got written
         if not os.path.exists(file_path):

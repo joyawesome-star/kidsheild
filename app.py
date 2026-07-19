@@ -428,7 +428,15 @@ def create_app():
                 if not file_path:
                     continue
 
-                image_url = "/" + os.path.relpath(file_path, BASE_DIR).replace("\\\\", "/")
+                # Avoid relpath crash across Windows drives (C: vs D:)
+                fp_norm = os.path.normpath(str(file_path))
+                base_norm = os.path.normpath(str(BASE_DIR))
+                if fp_norm.startswith(base_norm):
+                    rel = os.path.relpath(fp_norm, base_norm)
+                    image_url = "/" + rel.replace("\\\\", "/")
+                else:
+                    image_url = "/qrCodes/" + os.path.basename(fp_norm)
+
                 items.append({"image_url": image_url, "qr_unique_id": r.get("qr_unique_id")})
 
             return jsonify({"items": items}), 200
@@ -530,7 +538,16 @@ def create_app():
                     )
                     if file_row and file_row[0] and file_row[0][0]:
                         fp = file_row[0][0]
-                        obj["image_url"] = "/" + os.path.relpath(fp, BASE_DIR).replace("\\\\", "/")
+                        # Avoid os.path.relpath(fp, BASE_DIR) crash when fp is on a different drive (C: vs D:).
+                        # If fp is under BASE_DIR, build relative URL; otherwise serve from /qrCodes/<filename>.
+                        fp_norm = os.path.normpath(str(fp))
+                        base_norm = os.path.normpath(str(BASE_DIR))
+                        if fp_norm.startswith(base_norm):
+                            rel = os.path.relpath(fp_norm, base_norm)
+                            obj["image_url"] = "/" + rel.replace("\\\\", "/")
+                        else:
+                            obj["image_url"] = "/qrCodes/" + os.path.basename(fp_norm)
+
 
                 rows.append(obj)
 
@@ -746,7 +763,14 @@ def create_app():
                     )
                     if file_row and file_row[0] and file_row[0][0]:
                         fp = file_row[0][0]
-                        obj["image_url"] = "/" + os.path.relpath(fp, BASE_DIR).replace("\\\\", "/")
+                        fp_norm = os.path.normpath(str(fp))
+                        base_norm = os.path.normpath(str(BASE_DIR))
+                        if fp_norm.startswith(base_norm):
+                            rel = os.path.relpath(fp_norm, base_norm)
+                            obj["image_url"] = "/" + rel.replace("\\\\", "/")
+                        else:
+                            obj["image_url"] = "/qrCodes/" + os.path.basename(fp_norm)
+
 
                 rows.append(obj)
 
