@@ -51,6 +51,8 @@ from supabaseConnect import insert_and_get_id, get_query_result, execute_query
 # NOTE: This app historically used SQLAlchemy + raw SQL.
 # Deployment on Render must include a PostgreSQL driver.
 
+# Import scan blueprint
+from scanByQrId import scan_bp
 
 
 def create_app():
@@ -192,6 +194,9 @@ def create_app():
     @app.get("/admin_dashboard.html")
     def admin_dashboard_page():
         return _send_html("admin_dashboard.html")
+
+    # Register scan blueprint BEFORE the static catchall to ensure proper route matching
+    app.register_blueprint(scan_bp)
 
     # Generic static route for images/assets referred by html via relative paths
     @app.get("/<path:filename>")
@@ -570,8 +575,8 @@ def create_app():
         """
         try:
             payload = request.get_json(force=True, silent=True) or {}
-            id_raw = (payload.get("id") or request.args.get("id") or "").strip()
-            user_id_raw = (payload.get("user_id") or request.args.get("user_id") or "").strip()
+            id_raw = str(payload.get("id") or request.args.get("id") or "").strip()
+            user_id_raw = str(payload.get("user_id") or request.args.get("user_id") or "").strip()
 
             if not id_raw:
                 return jsonify({"message": "id is required"}), 400

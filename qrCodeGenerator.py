@@ -138,19 +138,18 @@ def generate_qr_code_with_db() -> Optional[Dict[str, Any]]:
         file_name = f"{qr_unique_id}.jpg"
         file_path = os.path.join(QR_CODE_FOLDER, file_name)
 
-        # QR payload MUST be a full URL with query params.
-        # Use `mode=view` so studentForm.html loads in readonly mode.
-        # The frontend uses `qr_code_id` (public.qr_codes.id) to query:
-        #   /api/user/students/by_qr_code_id
-        # and that endpoint supports numeric id.
-        student_form_base = os.environ.get('STUDENT_FORM_BASE_URL', '').strip().rstrip('/')
-        if student_form_base:
-            form_url = f"{student_form_base}/studentForm.html?qr_code_id={qr_id}&mode=view"
+        # QR payload encodes the scan endpoint URL with qr_unique_id.
+        # The scan endpoint (scanByQrId.py) will look up the QR state at runtime
+        # and either show a status page or redirect to the student form.
+        # This way the QR does not need to be regenerated when state changes.
+        server_base = os.environ.get('STUDENT_FORM_BASE_URL', '').strip().rstrip('/')
+        if server_base:
+            scan_url = f"{server_base}/scan/{qr_unique_id}"
         else:
-            # Fallback for local/testing (works if QR is scanned inside same origin)
-            form_url = f"/studentForm.html?qr_code_id={qr_id}&mode=view"
+            # Fallback for local/testing
+            scan_url = f"/scan/{qr_unique_id}"
 
-        _generate_qr_image(data=form_url, output_path=file_path)
+        _generate_qr_image(data=scan_url, output_path=file_path)
 
 
         # Sanity check: verify file got written

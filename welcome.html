@@ -19,7 +19,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            padding: 20px;
+            padding: 1.25rem;
         }
 
         body::before {
@@ -39,7 +39,7 @@
             backdrop-filter: blur(15px);
             -webkit-backdrop-filter: blur(15px);
             border: 1px solid rgba(255, 255, 255, 0.15);
-            border-radius: 15px;
+            border-radius: 0.9375rem;
             box-shadow: 0 15px 50px rgba(0, 0, 0, 0.4);
             display: flex;
             max-width: 1050px;
@@ -52,20 +52,20 @@
 
         .content-section {
             flex: 1;
-            padding: 60px 45px;
+            padding: 3.75rem 2.8125rem;
             display: flex;
             flex-direction: column;
             justify-content: center;
         }
 
         .header {
-            margin-bottom: 30px;
+            margin-bottom: 1.875rem;
         }
 
         .header h1 {
             font-size: 2.8em;
             color: white;
-            margin-bottom: 10px;
+            margin-bottom: 0.625rem;
             text-shadow: 0 2px 4px rgba(0,0,0,0.3);
         }
 
@@ -79,17 +79,17 @@
         .description {
             color: rgba(255, 255, 255, 0.8);
             line-height: 1.8;
-            margin: 25px 0;
+            margin: 1.5625rem 0;
             font-size: 1.05em;
         }
 
         .features {
-            margin: 25px 0;
+            margin: 1.5625rem 0;
         }
 
         .features h3 {
             color: #a5b4fc;
-            margin-bottom: 15px;
+            margin-bottom: 0.9375rem;
             font-size: 1.3em;
         }
 
@@ -100,8 +100,8 @@
 
         .features li {
             color: rgba(255, 255, 255, 0.75);
-            margin-bottom: 12px;
-            padding-left: 25px;
+            margin-bottom: 0.75rem;
+            padding-left: 1.5625rem;
             position: relative;
             font-size: 1em;
             line-height: 1.6;
@@ -120,7 +120,7 @@
             flex: 0 0 35%;
             background: rgba(255, 255, 255, 0.04);
             border-left: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 60px 40px;
+            padding: 3.75rem 2.5rem;
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -130,7 +130,7 @@
 
         .admin-section h2 {
             color: white;
-            margin-bottom: 30px;
+            margin-bottom: 1.875rem;
             font-size: 1.3em;
             text-shadow: 0 1px 2px rgba(0,0,0,0.2);
         }
@@ -138,10 +138,10 @@
         .admin-btn {
             background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
             color: white;
-            padding: 15px 40px;
+            padding: 0.9375rem 2.5rem;
             font-size: 1.1em;
             border: none;
-            border-radius: 8px;
+            border-radius: 0.5rem;
             cursor: pointer;
             font-weight: 600;
             transition: all 0.3s ease;
@@ -165,16 +165,16 @@
         .user-btn {
             background: transparent;
             color: white;
-            padding: 15px 40px;
+            padding: 0.9375rem 2.5rem;
             font-size: 1.1em;
             border: 2px solid rgba(255, 255, 255, 0.3);
-            border-radius: 8px;
+            border-radius: 0.5rem;
             cursor: pointer;
             font-weight: 600;
             transition: all 0.3s ease;
             text-decoration: none;
             display: inline-block;
-            margin-top: 15px;
+            margin-top: 0.9375rem;
             width: 100%;
             max-width: 220px;
         }
@@ -199,11 +199,11 @@
                 flex: 1;
                 border-left: none;
                 border-top: 1px solid rgba(255, 255, 255, 0.1);
-                padding: 40px;
+                padding: 2.5rem;
             }
 
             .content-section {
-                padding: 40px;
+                padding: 2.5rem;
             }
 
             .header h1 {
@@ -212,6 +212,22 @@
 
             .description {
                 font-size: 0.95em;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .content-section {
+                padding: 1.5rem;
+            }
+            .admin-section {
+                padding: 1.5rem;
+            }
+            .header h1 {
+                font-size: 1.8em;
+            }
+            .admin-btn,
+            .user-btn {
+                max-width: 100%;
             }
         }
     </style>

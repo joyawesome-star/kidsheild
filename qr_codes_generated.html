@@ -2,24 +2,96 @@
 <html>
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>QR Batch</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: #1a1a2e;
+      color: white;
+      font-family: "Segoe UI", Arial, sans-serif;
+      padding: 1.5rem;
+    }
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+    h2 {
+      margin: 0 0 1rem 0;
+      font-size: 1.375rem;
+    }
+    #qrItems {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: flex-start;
+      justify-content: center;
+      gap: 1rem;
+    }
+    .qr-card {
+      display: flex;
+      flex-direction: column;
+      gap: 0.375rem;
+      padding: 0.75rem;
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 0.625rem;
+      background: rgba(255,255,255,0.06);
+      width: 100%;
+      max-width: 260px;
+    }
+    .qr-card img {
+      width: 100%;
+      height: auto;
+      aspect-ratio: 1 / 1;
+      object-fit: contain;
+    }
+    .qr-card .uid {
+      color: white;
+      font-size: 0.875rem;
+      word-break: break-all;
+    }
+    .actions {
+      margin-top: 1.25rem;
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+    .zip-link {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 0.75rem 1rem;
+      border-radius: 0.5rem;
+      text-decoration: none;
+      font-weight: 700;
+      display: inline-block;
+    }
+    .dash-link {
+      color: #a5b4fc;
+      text-decoration: none;
+      font-weight: 700;
+      align-self: center;
+    }
+    @media (max-width: 640px) {
+      body { padding: 1rem; }
+      .qr-card { max-width: 100%; }
+      .actions { flex-direction: column; align-items: center; }
+    }
+  </style>
 </head>
-<body style="margin:0;min-height:100vh;background:#1a1a2e;color:white;font-family:Segoe UI,Arial,sans-serif;">
-  <div style="max-width:1100px;margin:0 auto;padding:24px;">
-    <h2 style="margin:0 0 16px 0;">Generated QR Codes</h2>
+<body>
+  <div class="container">
+    <h2>Generated QR Codes</h2>
 
-    <div id="qrItems" style="display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:flex-start;">
+    <div id="qrItems">
       <!-- QR cards are rendered client-side -->
     </div>
 
-    <div style="margin-top:20px;display:flex;gap:12px;flex-wrap:wrap;">
-      <a id="downloadZipLink" href="#" style="background:linear-gradient(135deg, #667eea 0%, #764ba2 100%);color:white;padding:12px 16px;border-radius:8px;text-decoration:none;font-weight:700;display:inline-block;">
-        Download ZIP
-      </a>
-      <a href="/admin_dashboard.html" style="color:#a5b4fc;text-decoration:none;font-weight:700;align-self:center;">
-        Go to dashboard
-      </a>
+    <div class="actions">
+      <a id="downloadZipLink" href="#" class="zip-link">Download ZIP</a>
+      <a href="/admin_dashboard.html" class="dash-link">Go to dashboard</a>
     </div>
   </div>
 
@@ -59,9 +131,9 @@
           const imageUrl = it?.image_url || '';
           const uid = it?.qr_unique_id ?? '';
           return `
-            <div style="display:flex;flex-direction:column;gap:6px;margin:12px;padding:12px;border:1px solid rgba(255,255,255,0.2);border-radius:10px;background:rgba(255,255,255,0.06)">
-              <img src="${imageUrl}" style="width:220px;height:220px;object-fit:contain" />
-              <div style="color:white;font-family:Segoe UI,Arial,sans-serif;font-size:14px">QR Unique ID: ${uid}</div>
+            <div class="qr-card">
+              <img src="${imageUrl}" alt="QR code" />
+              <div class="uid">QR Unique ID: ${uid}</div>
             </div>
           `;
         }).join('');

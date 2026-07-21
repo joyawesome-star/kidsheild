@@ -16,178 +16,186 @@
       background: url('kidshield-bg.jpg') center/contain no-repeat fixed;
       background-color: #1a1a2e;
       min-height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      padding: 20px;
-    }
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 1.25rem;
+        }
 
-    body::before {
-      content: '';
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: rgba(0, 0, 0, 0.5);
-      pointer-events: none;
-      z-index: -1;
-    }
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            pointer-events: none;
+            z-index: -1;
+        }
 
-    #logoutBtn {
-      position: absolute;
-      top: 12px;
-      right: 12px;
-      z-index: 2;
-      flex: 0 0 auto;
-      width: 110px;
-      height: 34px;
-      min-width: 110px;
+        #logoutBtn {
+            position: absolute;
+            top: 0.75rem;
+            right: 0.75rem;
+            z-index: 2;
+            flex: 0 0 auto;
+            width: 6.875rem;
+            height: 2.125rem;
+            min-width: 6.875rem;
 
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      padding: 0 10px;
-      font-weight: 700;
-      font-size: 0.95em;
-      border-radius: 8px;
-    }
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 0.625rem;
+            font-weight: 700;
+            font-size: 0.95em;
+            border-radius: 0.5rem;
+        }
 
 
 
-    .profile-container {
-      background: rgba(255, 255, 255, 0.1);
-      backdrop-filter: blur(15px);
-      -webkit-backdrop-filter: blur(15px);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      border-radius: 15px;
-      box-shadow: 0 15px 50px rgba(0, 0, 0, 0.4);
-      width: 100%;
-      max-width: 520px;
-      padding: 50px 40px;
-      position: relative;
-      z-index: 1;
-      color: white;
-    }
+        .profile-container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 0.9375rem;
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.4);
+            width: 100%;
+            max-width: 520px;
+            padding: 3.125rem 2.5rem;
+            position: relative;
+            z-index: 1;
+            color: white;
+        }
 
-    .profile-header {
-      text-align: center;
-      margin-bottom: 25px;
-    }
+        .profile-header {
+            text-align: center;
+            margin-bottom: 1.5625rem;
+        }
 
-    .profile-header h1 {
-      color: white;
-      font-size: 2.0em;
-      margin-bottom: 10px;
-      text-shadow: 0 2px 4px rgba(0,0,0,0.3);
-    }
+        .profile-header h1 {
+            color: white;
+            font-size: 2.0em;
+            margin-bottom: 0.625rem;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
 
-    .profile-header p {
-      color: #a5b4fc;
-      font-size: 0.95em;
-      font-weight: 600;
-      letter-spacing: 1px;
-      text-transform: uppercase;
-    }
+        .profile-header p {
+            color: #a5b4fc;
+            font-size: 0.95em;
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
 
-    .welcome-card {
-      background: rgba(255, 255, 255, 0.06);
-      border: 1px solid rgba(255, 255, 255, 0.18);
-      border-radius: 12px;
-      padding: 18px 16px;
-      margin-bottom: 22px;
-    }
+        .welcome-card {
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            border-radius: 0.75rem;
+            padding: 1.125rem 1rem;
+            margin-bottom: 1.375rem;
+        }
 
-    #welcomeMessage {
-      font-size: 1.1em;
-      font-weight: 700;
-      text-align: center;
-      color: #ffffff;
-    }
+        #welcomeMessage {
+            font-size: 1.1em;
+            font-weight: 700;
+            text-align: center;
+            color: #ffffff;
+        }
 
-    .subtext {
-      text-align: center;
-      margin-top: 10px;
-      color: rgba(165, 180, 252, 0.9);
-      font-weight: 600;
-      font-size: 0.95em;
-    }
+        .subtext {
+            text-align: center;
+            margin-top: 0.625rem;
+            color: rgba(165, 180, 252, 0.9);
+            font-weight: 600;
+            font-size: 0.95em;
+        }
 
-    .actions {
-      display: flex;
-      gap: 12px;
-      margin-top: 18px;
-      flex-wrap: wrap;
-    }
+        .actions {
+            display: flex;
+            gap: 0.75rem;
+            margin-top: 1.125rem;
+            flex-wrap: wrap;
+        }
 
-    .btn {
-      flex: 1;
-      min-width: 180px;
-      padding: 14px;
-      border-radius: 8px;
-      border: none;
-      cursor: pointer;
-      font-weight: 700;
-      font-size: 1.05em;
-      transition: all 0.3s ease;
-    }
+        .btn {
+            flex: 1;
+            min-width: 180px;
+            padding: 0.875rem;
+            border-radius: 0.5rem;
+            border: none;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 1.05em;
+            transition: all 0.3s ease;
+        }
 
-    .btn.primary {
-      background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
-      color: white;
-      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-    }
+        .btn.primary {
+            background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+            color: white;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
 
-    .btn.primary:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 20px rgba(118, 75, 162, 0.4);
-      filter: brightness(1.1);
-    }
+        .btn.primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(118, 75, 162, 0.4);
+            filter: brightness(1.1);
+        }
 
-    .btn.secondary {
-      background: transparent;
-      color: white;
-      border: 2px solid rgba(255, 255, 255, 0.3);
-    }
+        .btn.secondary {
+            background: transparent;
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
 
-    .btn.secondary:hover {
-      background: rgba(255, 255, 255, 0.1);
-      border-color: white;
-    }
+        .btn.secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: white;
+        }
 
-    .error-message {
-      display: none;
-      background: rgba(255, 0, 0, 0.15);
-      color: #ff9999;
-      padding: 12px;
-      border-radius: 8px;
-      margin-top: 16px;
-      border-left: 4px solid #ff4d4d;
-      font-weight: 700;
-      text-align: center;
-    }
+        .error-message {
+            display: none;
+            background: rgba(255, 0, 0, 0.15);
+            color: #ff9999;
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            margin-top: 1rem;
+            border-left: 4px solid #ff4d4d;
+            font-weight: 700;
+            text-align: center;
+        }
 
-    .error-message.show {
-      display: block;
-    }
+        .error-message.show {
+            display: block;
+        }
 
-    .loading {
-      display: none;
-      text-align: center;
-      color: #a5b4fc;
-      font-weight: 700;
-      margin-top: 12px;
-    }
+        .loading {
+            display: none;
+            text-align: center;
+            color: #a5b4fc;
+            font-weight: 700;
+            margin-top: 0.75rem;
+        }
 
-    .loading.show {
-      display: block;
-    }
+        .loading.show {
+            display: block;
+        }
 
-    @media (max-width: 480px) {
-      .profile-container {
-        padding: 40px 25px;
-      }
-    }
+        @media (max-width: 480px) {
+            .profile-container {
+                padding: 2.5rem 1.5625rem;
+            }
+            .actions {
+                flex-direction: column;
+                gap: 0.75rem;
+            }
+            .btn {
+                min-width: auto;
+                width: 100%;
+            }
+        }
   </style>
 </head>
 <body>
@@ -371,27 +379,11 @@
       });
     });
 
-    // Activate QR and open student form (edit/create mode handled in studentForm.html)
-    async function activateQrAndOpenForm(qrCodeId) {
+// Navigate to student form for first-time details entry.
+    // Activation happens on successful form submission, not here.
+    function activateQrAndOpenForm(qrCodeId) {
       if (!qrCodeId && qrCodeId !== 0) return;
-
-      try {
-        const resp = await fetch('/api/user/qr_codes/activate', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ qr_code_id: qrCodeId })
-        });
-
-        if (!resp.ok) {
-          const text = await resp.text().catch(() => '');
-          throw new Error(text || `Failed with status ${resp.status}`);
-        }
-
-        // Redirect to studentForm in edit mode (since it may already exist)
-        window.location.href = `/studentForm.html?qr_code_id=${encodeURIComponent(qrCodeId)}&mode=edit`;
-      } catch (e) {
-        showError(String(e));
-      }
+      window.location.href = `/studentForm.html?qr_code_id=${encodeURIComponent(qrCodeId)}&mode=edit&activate_on_submit=1`;
     }
 
     // Always redirect to studentForm edit mode for the QR id.

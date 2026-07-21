@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Admin Dashboard - QR Codes</title>
   <style>
     :root {
@@ -14,6 +14,7 @@
       --accent1: #667eea;
       --accent2: #764ba2;
       --danger: #ff4d4d;
+      --font-base: 16px;
     }
     * { box-sizing: border-box; }
     body {
@@ -22,7 +23,7 @@
       background: var(--bg);
       color: var(--text);
       font-family: "Segoe UI", Arial, sans-serif;
-      padding: 24px;
+      padding: 1.5rem;
     }
     .container {
       max-width: 1200px;
@@ -32,23 +33,23 @@
       display: flex;
       align-items: flex-end;
       justify-content: space-between;
-      gap: 16px;
-      margin-bottom: 16px;
+      gap: 1rem;
+      margin-bottom: 1rem;
     }
     h1 {
       margin: 0;
-      font-size: 22px;
+      font-size: 1.375rem;
       line-height: 1.2;
     }
     .sub {
-      margin-top: 6px;
+      margin-top: 0.375rem;
       color: var(--muted);
       font-weight: 600;
-      font-size: 13px;
+      font-size: 0.8125rem;
     }
     .controls {
       display: flex;
-      gap: 12px;
+      gap: 0.75rem;
       align-items: center;
       flex-wrap: wrap;
       justify-content: flex-end;
@@ -58,8 +59,8 @@
       border: 1px solid var(--border);
       background: var(--card);
       color: var(--text);
-      border-radius: 10px;
-      padding: 10px 14px;
+      border-radius: 0.625rem;
+      padding: 0.625rem 0.875rem;
       font-weight: 700;
       text-decoration: none;
       display: inline-flex;
@@ -78,24 +79,24 @@
     .tableWrap {
       background: var(--card);
       border: 1px solid var(--border);
-      border-radius: 14px;
-      overflow: hidden;
+      border-radius: 0.875rem;
+      overflow-x: auto;
     }
     table {
       width: 100%;
       border-collapse: collapse;
-      font-size: 14px;
+      font-size: 0.875rem;
     }
     thead th {
       background: rgba(255,255,255,0.06);
       color: rgba(255,255,255,0.9);
       text-align: left;
-      padding: 12px 12px;
+      padding: 0.75rem;
       border-bottom: 1px solid rgba(255,255,255,0.12);
       white-space: nowrap;
     }
     tbody td {
-      padding: 12px 12px;
+      padding: 0.75rem;
       border-bottom: 1px solid rgba(255,255,255,0.10);
       vertical-align: top;
       color: rgba(255,255,255,0.92);
@@ -111,70 +112,96 @@
     .pill {
       display: inline-flex;
       align-items: center;
-      gap: 8px;
+      gap: 0.5rem;
       border: 1px solid rgba(255,255,255,0.18);
-      padding: 6px 10px;
+      padding: 0.375rem 0.625rem;
       border-radius: 999px;
       background: rgba(255,255,255,0.05);
       color: rgba(255,255,255,0.9);
       font-weight: 700;
-      font-size: 12px;
+      font-size: 0.75rem;
     }
     .muted {
       color: var(--muted);
       font-weight: 600;
-      font-size: 13px;
+      font-size: 0.8125rem;
     }
     .downloadBtn {
       border: none;
       background: linear-gradient(135deg, var(--accent1) 0%, var(--accent2) 100%);
       color: white;
       font-weight: 800;
-      padding: 10px 12px;
-      border-radius: 10px;
+      padding: 0.625rem 0.75rem;
+      border-radius: 0.625rem;
       text-decoration: none;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      min-width: 110px;
+      min-width: 6.875rem;
     }
     .pagination {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 12px;
-      padding: 14px;
+      gap: 0.75rem;
+      padding: 0.875rem;
     }
     .pagination .left,
     .pagination .right{
       display:flex;
       align-items:center;
-      gap: 10px;
+      gap: 0.625rem;
       flex-wrap: wrap;
     }
     .error {
-      margin-top: 12px;
-      padding: 12px;
+      margin-top: 0.75rem;
+      padding: 0.75rem;
       background: rgba(255, 77, 77, 0.14);
       border: 1px solid rgba(255, 77, 77, 0.35);
-      border-radius: 12px;
+      border-radius: 0.75rem;
       color: #ffd6d6;
       font-weight: 700;
       display: none;
     }
     .small {
-      font-size: 12px;
+      font-size: 0.75rem;
       color: var(--muted);
       font-weight: 600;
     }
     .qrThumb {
-      width: 62px;
-      height: 62px;
+      width: 3.875rem;
+      height: 3.875rem;
       object-fit: contain;
       background: rgba(255,255,255,0.06);
       border: 1px solid rgba(255,255,255,0.12);
-      border-radius: 10px;
-      padding: 6px;
+      border-radius: 0.625rem;
+      padding: 0.375rem;
+    }
+
+    /* Responsive breakpoints */
+    @media (max-width: 768px) {
+      body { padding: 1rem; }
+      .header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .controls { width: 100%; justify-content: flex-start; }
+    }
+
+    @media (max-width: 640px) {
+      .tableWrap { border-radius: 0.625rem; }
+      table { font-size: 0.8125rem; }
+      thead th, tbody td { padding: 0.5rem; }
+      .pagination { flex-direction: column; align-items: center; }
+      .pagination .left, .pagination .right { width: 100%; justify-content: center; }
+      .downloadBtn { min-width: auto; padding: 0.5rem 0.75rem; }
+    }
+
+    @media (max-width: 480px) {
+      h1 { font-size: 1.125rem; }
+      .btn { padding: 0.5rem 0.625rem; font-size: 0.8125rem; }
+      .pill { font-size: 0.6875rem; padding: 0.25rem 0.5rem; }
+      .qrThumb { width: 3rem; height: 3rem; }
     }
   </style>
 </head>
@@ -316,6 +343,88 @@
     </div>
   </div>
 
+  <!-- Mark as Sold Dialog -->
+  <dialog id="markSoldDialog" style="
+    background: #1a1a2e;
+    color: white;
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 16px;
+    padding: 0;
+    max-width: 460px;
+    width: 90%;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+    backdrop-filter: blur(20px);
+  ">
+    <div style="padding: 28px 28px 20px;">
+      <h2 style="margin: 0 0 6px; font-size: 20px;">Mark as Sold</h2>
+      <p style="margin: 0 0 20px; color: rgba(255,255,255,0.65); font-size: 14px;">
+        Select how to associate a user with this QR code.
+      </p>
+
+      <label style="display:flex; flex-direction:column; gap:8px; margin-bottom: 18px; font-size: 14px; font-weight: 600;">
+        <span>Flow</span>
+        <select id="soldFlowSelect" style="
+          background: rgba(255,255,255,0.06);
+          color: white;
+          border: 1px solid rgba(255,255,255,0.18);
+          border-radius: 10px;
+          padding: 10px 12px;
+          font-weight: 700;
+          font-size: 14px;
+        ">
+          <option value="existing" style="background:#1a1a2e; color:white;">Existing user — provide email</option>
+          <option value="new" style="background:#1a1a2e; color:white;">New user — redirect to signup</option>
+        </select>
+      </label>
+
+      <div id="soldEmailGroup" style="display:flex; flex-direction:column; gap:8px; margin-bottom: 18px; font-size: 14px; font-weight: 600;">
+        <label for="soldEmailInput">User Email</label>
+        <input
+          id="soldEmailInput"
+          type="email"
+          placeholder="Enter user email address"
+          style="
+            width: 100%;
+            background: rgba(255,255,255,0.06);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.18);
+            border-radius: 10px;
+            padding: 10px 12px;
+            font-weight: 600;
+            font-size: 14px;
+          "
+        />
+      </div>
+
+      <div id="soldNewInfo" style="display:none; margin-bottom: 18px; padding: 12px; background: rgba(255,255,255,0.05); border-radius: 10px; font-size: 13px; color: rgba(255,255,255,0.75);">
+        You will be redirected to the signup page. After the new user registers, the QR code will be automatically marked as sold.
+      </div>
+
+      <div style="display:flex; gap:12px; justify-content:flex-end; margin-top: 10px;">
+        <button id="soldCancelBtn" type="button" style="
+          cursor: pointer;
+          border: 1px solid rgba(255,255,255,0.2);
+          background: transparent;
+          color: white;
+          border-radius: 10px;
+          padding: 10px 20px;
+          font-weight: 700;
+          font-size: 14px;
+        ">Cancel</button>
+        <button id="soldConfirmBtn" type="button" style="
+          cursor: pointer;
+          border: none;
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          color: white;
+          border-radius: 10px;
+          padding: 10px 20px;
+          font-weight: 700;
+          font-size: 14px;
+        ">Confirm</button>
+      </div>
+    </div>
+  </dialog>
+
   <script>
     const PAGE_SIZE = 10;
 
@@ -444,61 +553,121 @@
       document.getElementById('nextBtn').disabled = page >= totalPages;
     }
 
+    // --- Mark as Sold Dialog Logic ---
+    let _pendingSoldId = null;
+
+    function openMarkSoldDialog(id) {
+      _pendingSoldId = id;
+      const dialog = document.getElementById('markSoldDialog');
+      if (!dialog) return;
+
+      // Reset fields
+      document.getElementById('soldFlowSelect').value = 'existing';
+      document.getElementById('soldEmailInput').value = '';
+      document.getElementById('soldEmailGroup').style.display = 'flex';
+      document.getElementById('soldNewInfo').style.display = 'none';
+
+      dialog.showModal();
+    }
+
     async function markAsSold(id) {
       if (!id && id !== 0) return;
-
-      const btn = document.getElementById(`markSoldBtn-${id}`);
-      if (btn) {
-        btn.disabled = true;
-        const prev = btn.textContent;
-        btn.dataset.prevText = prev;
-        btn.textContent = 'Updating...';
-      }
-
-      // Simple dialogue using browser prompts (avoid large UI changes)
-      try {
-        const mode = (window.prompt('Mark as Sold: type "existing" to use an existing user, or "new" to create a new user.') || '').trim().toLowerCase();
-
-        if (mode !== 'existing' && mode !== 'new') {
-          throw new Error('Please enter "existing" or "new".');
-        }
-
-        if (mode === 'existing') {
-          const email = (window.prompt('Enter the user email for this QR code:') || '').trim();
-          if (!email) throw new Error('Email is required.');
-
-          const res = await fetch(`/api/admin/qr_codes/mark_sold?id=${encodeURIComponent(id)}`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ id, flow: 'existing', email })
-          });
-
-          if (!res.ok) {
-            const text = await res.text().catch(() => '');
-            throw new Error(text || `Update failed with status ${res.status}`);
-          }
-
-          window.location.reload();
-          return;
-        }
-
-        // mode === 'new'
-        // Redirect to signup page, keeping qr_code_id so it can attach after signup.
-        const url = new URL('/usersignup.html', window.location.origin);
-        url.searchParams.set('qr_code_id', String(id));
-        url.searchParams.set('source', 'admin_dashboard');
-        window.location.href = url.toString();
-      } catch (e) {
-        const msg = String(e);
-        if (btn) {
-          btn.textContent = btn.dataset.prevText || 'Mark as Sold';
-        }
-        const box = document.getElementById('errorBox');
-        box.style.display = 'block';
-        box.textContent = msg;
-        return;
-      }
+      openMarkSoldDialog(id);
     }
+
+    // Flow select toggle
+    document.addEventListener('DOMContentLoaded', () => {
+      const flowSelect = document.getElementById('soldFlowSelect');
+      const emailGroup = document.getElementById('soldEmailGroup');
+      const newInfo = document.getElementById('soldNewInfo');
+
+      if (flowSelect) {
+        flowSelect.addEventListener('change', () => {
+          const val = flowSelect.value;
+          if (val === 'existing') {
+            emailGroup.style.display = 'flex';
+            newInfo.style.display = 'none';
+          } else {
+            emailGroup.style.display = 'none';
+            newInfo.style.display = 'block';
+          }
+        });
+      }
+
+      // Cancel button
+      const cancelBtn = document.getElementById('soldCancelBtn');
+      if (cancelBtn) {
+        cancelBtn.addEventListener('click', () => {
+          const dialog = document.getElementById('markSoldDialog');
+          if (dialog) dialog.close();
+          _pendingSoldId = null;
+        });
+      }
+
+      // Confirm button
+      const confirmBtn = document.getElementById('soldConfirmBtn');
+      if (confirmBtn) {
+        confirmBtn.addEventListener('click', async () => {
+          const id = _pendingSoldId;
+          if (!id && id !== 0) return;
+
+          const dialog = document.getElementById('markSoldDialog');
+          const btn = document.getElementById(`markSoldBtn-${id}`);
+
+          confirmBtn.disabled = true;
+          confirmBtn.textContent = 'Processing...';
+
+          try {
+            const flowSelect = document.getElementById('soldFlowSelect');
+            const mode = flowSelect?.value || 'existing';
+
+            if (mode === 'existing') {
+              const emailInput = document.getElementById('soldEmailInput');
+              const email = (emailInput?.value || '').trim();
+              if (!email) {
+                throw new Error('Email is required.');
+              }
+
+              const res = await fetch(`/api/admin/qr_codes/mark_sold?id=${encodeURIComponent(id)}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id, flow: 'existing', email })
+              });
+
+              if (!res.ok) {
+                const text = await res.text().catch(() => '');
+                throw new Error(text || `Update failed with status ${res.status}`);
+              }
+
+              // Success - reload
+              window.location.reload();
+              return;
+            }
+
+            // mode === 'new'
+            // Redirect to signup page, keeping qr_code_id so it can attach after signup.
+            if (dialog) dialog.close();
+            const url = new URL('/usersignup.html', window.location.origin);
+            url.searchParams.set('qr_code_id', String(id));
+            url.searchParams.set('source', 'admin_dashboard');
+            window.location.href = url.toString();
+          } catch (e) {
+            const msg = String(e);
+            if (btn) {
+              btn.disabled = false;
+              btn.textContent = btn.dataset?.prevText || 'Mark as Sold';
+            }
+            if (dialog) dialog.close();
+            _pendingSoldId = null;
+            confirmBtn.disabled = false;
+            confirmBtn.textContent = 'Confirm';
+            const box = document.getElementById('errorBox');
+            box.style.display = 'block';
+            box.textContent = msg;
+          }
+        });
+      }
+    });
 
     (function init() {
       const refreshBtn = document.getElementById('refreshBtn');
