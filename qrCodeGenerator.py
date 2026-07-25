@@ -6,6 +6,9 @@ from typing import Dict, List, Optional, Any
 import qrcode
 from sqlalchemy import create_engine, text
 
+# GitHub upload helper
+from github_upload import upload_qr_image
+
 # --- DB connection (as provided by user) ---
 DATABASE_URL = "postgresql://postgres.yjakxhhmesbncbxmibfp:m4JFPkWCxOtBayj7@aws-1-ap-northeast-2.pooler.supabase.com:6543/postgres"
 _engine = create_engine(DATABASE_URL, pool_pre_ping=True)
@@ -136,7 +139,7 @@ def generate_qr_code_with_db() -> Optional[Dict[str, Any]]:
         qr_unique_id = _get_qr_unique_id_by_id(qr_id=qr_id)
 
         file_name = f"{qr_unique_id}.jpg"
-        file_path = os.path.join(QR_CODE_FOLDER, file_name)
+        local_file_path = os.path.join(QR_CODE_FOLDER, file_name)
 
         # QR payload encodes the scan endpoint URL with qr_unique_id.
         # The scan endpoint (scanByQrId.py) will look up the QR state at runtime
@@ -149,25 +152,32 @@ def generate_qr_code_with_db() -> Optional[Dict[str, Any]]:
             # Fallback for local/testing
             scan_url = f"/scan/{qr_unique_id}"
 
-        _generate_qr_image(data=scan_url, output_path=file_path)
+        _generate_qr_image(data=scan_url, output_path=local_file_path)
 
 
         # Sanity check: verify file got written
-        if not os.path.exists(file_path):
-            raise RuntimeError(f"QR image file not created: {file_path}")
+        if not os.path.exists(local_file_path):
+            raise RuntimeError(f"QR image file not created: {local_file_path}")
 
+        # Upload to GitHub for persistent storage
+        # This ensures QR images survive Render's ephemeral filesystem restarts.
+        github_url = upload_qr_image(local_file_path)
+
+        # Store the GitHub URL as file_path if upload succeeded,
+        # otherwise fall back to the local path (for local development).
+        stored_file_path = github_url if github_url else local_file_path
 
         _update_qr_file_fields(
             qr_unique_id=qr_unique_id,
             file_name=file_name,
-            file_path=file_path,
+            file_path=stored_file_path,
         )
 
         return {
             "qr_id": qr_id,
             "qr_unique_id": qr_unique_id,
             "file_name": file_name,
-            "file_path": file_path,
+            "file_path": stored_file_path,
             "created_at": datetime.now().isoformat(),
         }
     except Exception as e:

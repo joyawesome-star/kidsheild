@@ -5,6 +5,7 @@ from datetime import datetime, timedelta
 import io
 import zipfile
 import secrets
+import urllib.request
 
 from flask import (
     Flask,
@@ -53,6 +54,37 @@ from supabaseConnect import insert_and_get_id, get_query_result, execute_query
 
 # Import scan blueprint
 from scanByQrId import scan_bp
+
+
+def _is_url_path(path: str) -> bool:
+    """Check if a file_path is a URL (GitHub raw URL) vs a local filesystem path."""
+    if not path:
+        return False
+    return str(path).startswith(("http://", "https://"))
+
+
+def _build_image_url(file_path: str, qr_id: int) -> str:
+    """
+    Build a displayable image URL from the stored file_path.
+    
+    - If file_path is a URL (GitHub raw), return it directly.
+    - If file_path is a local path under BASE_DIR, return a relative URL.
+    - Otherwise, fall back to /qrCodes/<filename>.
+    """
+    if not file_path:
+        return ""
+    
+    fp_str = str(file_path)
+    if _is_url_path(fp_str):
+        return fp_str
+    
+    fp_norm = os.path.normpath(fp_str)
+    base_norm = os.path.normpath(str(BASE_DIR))
+    if fp_norm.startswith(base_norm):
+        rel = os.path.relpath(fp_norm, base_norm)
+        return "/" + rel.replace("\\\\", "/")
+    else:
+        return "/qrCodes/" + os.path.basename(fp_norm)
 
 
 def create_app():
@@ -433,14 +465,8 @@ def create_app():
                 if not file_path:
                     continue
 
-                # Avoid relpath crash across Windows drives (C: vs D:)
-                fp_norm = os.path.normpath(str(file_path))
-                base_norm = os.path.normpath(str(BASE_DIR))
-                if fp_norm.startswith(base_norm):
-                    rel = os.path.relpath(fp_norm, base_norm)
-                    image_url = "/" + rel.replace("\\\\", "/")
-                else:
-                    image_url = "/qrCodes/" + os.path.basename(fp_norm)
+                qr_id = r.get("qr_id")
+                image_url = _build_image_url(file_path, qr_id)
 
                 items.append({"image_url": image_url, "qr_unique_id": r.get("qr_unique_id")})
 
@@ -543,16 +569,7 @@ def create_app():
                     )
                     if file_row and file_row[0] and file_row[0][0]:
                         fp = file_row[0][0]
-                        # Avoid os.path.relpath(fp, BASE_DIR) crash when fp is on a different drive (C: vs D:).
-                        # If fp is under BASE_DIR, build relative URL; otherwise serve from /qrCodes/<filename>.
-                        fp_norm = os.path.normpath(str(fp))
-                        base_norm = os.path.normpath(str(BASE_DIR))
-                        if fp_norm.startswith(base_norm):
-                            rel = os.path.relpath(fp_norm, base_norm)
-                            obj["image_url"] = "/" + rel.replace("\\\\", "/")
-                        else:
-                            obj["image_url"] = "/qrCodes/" + os.path.basename(fp_norm)
-
+                        obj["image_url"] = _build_image_url(fp, qr_id)
 
                 rows.append(obj)
 
@@ -768,14 +785,7 @@ def create_app():
                     )
                     if file_row and file_row[0] and file_row[0][0]:
                         fp = file_row[0][0]
-                        fp_norm = os.path.normpath(str(fp))
-                        base_norm = os.path.normpath(str(BASE_DIR))
-                        if fp_norm.startswith(base_norm):
-                            rel = os.path.relpath(fp_norm, base_norm)
-                            obj["image_url"] = "/" + rel.replace("\\\\", "/")
-                        else:
-                            obj["image_url"] = "/qrCodes/" + os.path.basename(fp_norm)
-
+                        obj["image_url"] = _build_image_url(fp, qr_id)
 
                 rows.append(obj)
 
@@ -1184,6 +1194,8 @@ def create_app():
 
         Querystring:
           ?id=<qr_codes.id>
+
+        Supports both local file paths and GitHub URL paths.
         """
         try:
             id_raw = (request.args.get("id") or "").strip()
@@ -1197,6 +1209,29 @@ def create_app():
             file_path = _resolve_qr_file_path_by_id(qr_id)
             if not file_path:
                 return jsonify({"message": "QR not found"}), 404
+
+            # If file_path is a URL (GitHub raw), fetch and serve
+            if _is_url_path(file_path):
+                try:
+                    req = urllib.request.Request(
+                        file_path,
+                        headers={"User-Agent": "Mozilla/5.0"}
+                    )
+                    with urllib.request.urlopen(req) as resp:
+                        img_data = resp.read()
+                    file_name = os.path.basename(file_path) or f"qr_{qr_id}.jpg"
+                    return (
+                        img_data,
+                        200,
+                        {
+                            "Content-Type": "image/jpeg",
+                            "Content-Disposition": f'attachment; filename="{file_name}"',
+                        },
+                    )
+                except Exception as e:
+                    return jsonify({"message": f"Failed to fetch QR from GitHub: {e}"}), 500
+
+            # Local file
             if not os.path.exists(file_path):
                 return jsonify({"message": "QR file not found on server"}), 404
 
@@ -1212,7 +1247,10 @@ def create_app():
 
     @app.get("/download_qr_batch")
     def download_qr_batch():
+        """Download a batch of QR images as a ZIP archive.
 
+        Supports both local file paths and GitHub URL paths.
+        """
         try:
             count = request.args.get("count", "1")
             try:
@@ -1235,10 +1273,26 @@ def create_app():
                     file_path = r.get("file_path")
                     file_name = r.get("file_name") or os.path.basename(file_path or "")
 
-                    if not file_path or not os.path.exists(file_path):
+                    if not file_path:
                         continue
 
-                    zf.write(file_path, arcname=file_name)
+                    if _is_url_path(file_path):
+                        # Fetch from URL
+                        try:
+                            req = urllib.request.Request(
+                                file_path,
+                                headers={"User-Agent": "Mozilla/5.0"}
+                            )
+                            with urllib.request.urlopen(req) as resp:
+                                img_data = resp.read()
+                            # Write to zip in-memory
+                            zf.writestr(file_name, img_data)
+                        except Exception as e:
+                            print(f"Warning: Failed to fetch {file_path}: {e}")
+                            continue
+                    elif os.path.exists(file_path):
+                        # Local file
+                        zf.write(file_path, arcname=file_name)
 
             zip_buffer.seek(0)
 
